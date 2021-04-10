@@ -39,6 +39,7 @@ if (typeof(window) !== "undefined"){
 
       let self = this
       self.worker = new Worker(file)
+      self.worker.onmessage = (event) => super.run(event.data.path, event.data.payload)
     }
 
     run(path, payload){
@@ -51,7 +52,14 @@ if (typeof(window) !== "undefined"){
 }
 
 if (typeof(module) !== "undefined"){
-  const bee = new SubscriptionService()
+  class Bee extends SubscriptionService {
+    run(path, payload){
+      super.run(path, payload)
+      postMessage({path, payload})
+    }
+  }
+
+  const bee = new Bee()
   onmessage = (event) => bee.run(event.data.path, event.data.payload)
   module.exports = bee
 }
