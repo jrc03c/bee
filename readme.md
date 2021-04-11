@@ -25,11 +25,8 @@ const queen = new Bee.Queen("worker.js")
 Then, issue commands:
 
 ```js
-let payload = {x: 5}
-
-queen.command("do-something", payload).then(result => {
-  // do something with `result`
-  console.log(result)
+queen.command("double", 32).then(result => {
+  console.log("The result is:", result)
 })
 ```
 
@@ -39,12 +36,10 @@ Of course, nothing will happen yet because we haven't created any drones! So, le
 importScripts("path/to/bee.js")
 const drone = new Bee.Drone()
 
-drone.on("do-something", function(request, response){
-  let x = request.data.x
-  console.log(`x = ${x}`)
-  console.log("I need to do something with x. Maybe I'll double it!")
+drone.on("double", function(request, response){
+  let x = request.data
   return response.send(x * 2)
 })
 ```
 
-Now, everything should work! Check out the [demo](./demo) for more info!
+Now, everything should work! Check out the [demo](./demo) to see it in action!
