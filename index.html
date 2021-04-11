@@ -4,47 +4,11 @@
     <meta charset="utf-8">
   </head>
   <body>
-    <script src="subscription-service.js"></script>
+    <script src="bee.js"></script>
     <script>
       window.onload = async function(){
-        function makeKey(n){
-          let alpha = "abcdefghijklmnopqrstuvwxyz1234567890"
-          let out = ""
-          for (let i=0; i<n; i++) out += alpha[parseInt(Math.random() * alpha.length)]
-          return out
-        }
-
-        class Bee extends SubscriptionService {
-          constructor(filename){
-            super()
-            let self = this
-            self.worker = new Worker(filename)
-
-            self.worker.onmessage = (event) => super.run(event.data.path, event.data.payload)
-          }
-
-          run(path, payload){
-            let self = this
-
-            return new Promise((resolve, reject) => {
-              try {
-                let cbid = makeKey(32)
-
-                self.on(cbid, result => {
-                  self.off(cbid, this)
-                  resolve(result)
-                })
-
-                self.worker.postMessage({path, payload, cbid})
-              } catch(e) {
-                reject(e)
-              }
-            })
-          }
-        }
-
-        const bee = new Bee("worker.js")
-        let result = await bee.run("double", 32)
+        const queen = new Bee.Queen("worker.js")
+        let result = await queen.command("double", 32)
         console.log(result)
       }
     </script>
