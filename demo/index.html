@@ -10,13 +10,21 @@
     <script>
       window.onload = async function(){
         const queen = new Bee.Queen()
-        queen.addDrones("worker.js", 10)
+        queen.addDrone("worker1.js")
+        queen.addDrone("worker2.js")
 
-        queen.command("do-slow-thing").then(result => {
+        // only worker1 is listening for this command
+        queen.command("thing1").then(result => {
           console.log(result)
         })
 
-        queen.command("do-fast-thing").then(result => {
+        // only worker2 is listening for this command
+        queen.command("thing2").then(result => {
+          console.log(result)
+        })
+
+        // both workers are listening for this command
+        queen.command("thing3").then(result => {
           console.log(result)
         })
       }

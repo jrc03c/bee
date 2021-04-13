@@ -61,6 +61,7 @@ class Drone extends SubscriptionService {
 
     let callbacks = self.subscriptions[path]
     if (callbacks) callbacks.forEach(cb => cb(request, response))
+    else response.send(null)
     return self
   }
 }
