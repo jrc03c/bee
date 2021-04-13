@@ -20,7 +20,7 @@ Then create a "queen" bee, which will be used to send commands to the drone(s). 
 
 ```js
 const queen = new Bee.Queen()
-queen.addDrone("worker.js")
+queen.addDrone("path/to/worker.js")
 ```
 
 Then, issue commands:
@@ -48,7 +48,7 @@ Now, everything should work! Check out the [demo](./demo) to see more stuff!
 We can also add multiple drones if we want to run many operations in "parallel." Of course, it's probably not really parallel. I don't know what's going on at a low level, but it's probably time-sliced or something to appear parallel. In any case, we can do:
 
 ```js
-queen.addDrones("worker.js", 10)
+queen.addDrones("path/to/worker.js", 10)
 ```
 
 Now the result of our commands will be an array of values rather than a single value (i.e., a single result from each drone).
