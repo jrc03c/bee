@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo-sm.png">
+  <img src="logo.png" width="256">
 </p>
 
 # Intro
