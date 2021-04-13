@@ -1,7 +1,12 @@
 importScripts("bee.js")
 const drone = new Bee.Drone()
 
-drone.on("double", function(request, response){
-  let x = request.data
-  return response.send(x * 2)
+drone.on("do-slow-thing", function(request, response){
+  setTimeout(() => {
+    response.send("Slow thing is done!")
+  }, 3000)
+})
+
+drone.on("do-fast-thing", function(request, response){
+  return response.send("Fast thing is done!")
 })

@@ -5,6 +5,10 @@ function makeKey(n){
   return out
 }
 
+Array.prototype.remove = function(item){
+  return this.filter(other => other !== item)
+}
+
 class SubscriptionService {
   constructor(){
     let self = this
@@ -65,24 +69,70 @@ class Queen extends SubscriptionService {
   constructor(filename){
     super()
     let self = this
-    self.worker = new Worker(filename)
+    self.hive = []
+  }
 
-    self.worker.onmessage = (event) => super.run(event.data.path, event.data.payload)
+  addDrone(filename){
+    let self = this
+    let drone = new Worker(filename)
+    drone.onmessage = (event) => super.run(event.data.path, event.data.payload)
+    self.hive.push(drone)
+    return drone
+  }
+
+  addDrones(filename, n){
+    let self = this
+    for (let i=0; i<n; i++) self.addDrone(filename)
+    return self
+  }
+
+  removeDrone(drone){
+    let self = this
+    self.hive = self.hive.remove(drone)
+    drone.terminate()
+    return self
+  }
+
+  removeDrones(drones){
+    let self = this
+    drones.forEach(drone => self.removeDrone(drone))
+    return self
   }
 
   run(path, payload){
     let self = this
 
+    if (self.hive.length === 0){
+      console.warn("The queen issued a command, but there are no drones in the hive! Use the queen's `addDrone` method to add a drone to the hive! (https://github.com/jrc03c/bee.js)")
+      return null
+    }
+
     return new Promise((resolve, reject) => {
       try {
-        let cbid = makeKey(32)
+        let results = new Array(self.hive.length)
 
-        self.on(cbid, result => {
-          self.off(cbid, this)
-          resolve(result)
+        let promises = self.hive.map(function(drone, i){
+          return new Promise(function(innerResolve, innerReject){
+            try {
+              let cbid = makeKey(32)
+
+              self.on(cbid, result => {
+                self.off(cbid, this)
+                results[i] = result
+                innerResolve()
+              })
+
+              drone.postMessage({path, payload, cbid})
+            } catch(e){
+              innerReject(e)
+            }
+          })
         })
 
-        self.worker.postMessage({path, payload, cbid})
+        Promise.all(promises).then(() => {
+          if (self.hive.length === 1) resolve(results[0])
+          else resolve(results)
+        })
       } catch(e) {
         reject(e)
       }
@@ -92,6 +142,22 @@ class Queen extends SubscriptionService {
   command(path, payload){
     let self = this
     return self.run(path, payload)
+  }
+
+  kill(){
+    let self = this
+    self.removeDrones(self.hive)
+    return null
+  }
+
+  terminate(){
+    let self = this
+    return self.kill()
+  }
+
+  stop(){
+    let self = this
+    return self.kill()
   }
 }
 
