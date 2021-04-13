@@ -1,4 +1,6 @@
-![](logo-sm.png)
+<p align="center">
+  <img src="logo-sm.png">
+</p>
 
 # Intro
 
