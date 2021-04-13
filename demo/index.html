@@ -8,7 +8,7 @@
     <script>
       window.onload = async function(){
         const queen = new Bee.Queen()
-        queen.addDrone("worker1.js")
+        queen.addDrones("worker1.js", 3)
         queen.addDrone("worker2.js")
 
         // only worker1 is listening for this command
