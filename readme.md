@@ -1,3 +1,5 @@
+![](logo.png)
+
 # Intro
 
 **Bee.js** is a helper tool for working with Web Workers. It uses an [Express](http://expressjs.com/)-like syntax.
