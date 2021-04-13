@@ -146,18 +146,20 @@ class Queen extends SubscriptionService {
 
   kill(){
     let self = this
+    self.stop()
     self.removeDrones(self.hive)
     return null
   }
 
-  terminate(){
-    let self = this
-    return self.kill()
-  }
-
   stop(){
     let self = this
-    return self.kill()
+    self.hive.forEach(drone => drone.terminate())
+    return self
+  }
+
+  terminate(){
+    let self = this
+    return self.terminate()
   }
 }
 

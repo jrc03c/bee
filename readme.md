@@ -52,3 +52,17 @@ queen.addDrones("worker.js", 10)
 ```
 
 Now the result of our commands will be an array of values rather than a single value (i.e., a single result from each drone).
+
+If things get out of control and we need to stop all of the workers at once, we can do:
+
+```js
+queen.stop() // or queen.terminate()
+```
+
+This stops all of the drones at once but leaves them in the queen's hive. However, if we want to be done with the queen completely and clean up after ourselves, we can do:
+
+```js
+queen.kill()
+```
+
+Which will stop all drones and remove them from the hive.
