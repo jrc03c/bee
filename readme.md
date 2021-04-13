@@ -59,7 +59,7 @@ If things get out of control and we need to stop all of the workers at once, we 
 queen.stop() // or queen.terminate()
 ```
 
-This stops all of the drones at once but leaves them in the queen's hive. However, if we want to be done with the queen completely and clean up after ourselves, we can do:
+This stops all of the drones at once but leaves them in the hive. However, if we want to be done with the queen completely and clean up after ourselves, we can do:
 
 ```js
 queen.kill()
