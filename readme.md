@@ -19,7 +19,8 @@ First, include the main bee.js script in your web page:
 Then create a "queen" bee, which will be used to send commands to the drone(s). You'll have to pass the path to the main Web Worker file to the constructor.
 
 ```js
-const queen = new Bee.Queen("worker.js")
+const queen = new Bee.Queen()
+queen.addDrone("worker.js")
 ```
 
 Then, issue commands:
@@ -30,7 +31,7 @@ queen.command("double", 32).then(result => {
 })
 ```
 
-Of course, nothing will happen yet because we haven't created any drones! So, let's do that now. In `worker.js`, do:
+Of course, nothing will happen yet because we haven't actually defined what's in `worker.js`! So, let's do that now. In `worker.js`, do:
 
 ```js
 importScripts("path/to/bee.js")
@@ -42,4 +43,12 @@ drone.on("double", function(request, response){
 })
 ```
 
-Now, everything should work! Check out the [demo](./demo) to see it in action!
+Now, everything should work! Check out the [demo](./demo) to see more stuff!
+
+We can also add multiple drones if we want to run many operations in "parallel." Of course, it's probably not really parallel. I don't know what's going on at a low level, but it's probably time-sliced or something to appear parallel. In any case, we can do:
+
+```js
+queen.addDrones("worker.js", 10)
+```
+
+Now the result of our commands will be an array of values rather than a single value (i.e., a single result from each drone).
