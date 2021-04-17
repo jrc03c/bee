@@ -160,7 +160,7 @@ class Queen extends SubscriptionService {
 
   terminate(){
     let self = this
-    return self.terminate()
+    return self.stop()
   }
 }
 
