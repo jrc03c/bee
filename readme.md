@@ -20,7 +20,7 @@ First, include the main bee.js script in your web page:
 <script src="path/to/bee.js"></script>
 ```
 
-Then create a "queen" bee, which will be used to send commands to the drone(s). You'll have to pass the path to the main Web Worker file to the constructor.
+Then create a "queen" bee, which will be used to send commands to the drone(s). Then add a drone using the path to the relevant Web Worker file.
 
 ```js
 const queen = new Bee.Queen()
