@@ -1,10 +1,10 @@
 {
   "name": "@jrc03c/bee",
-  "version": "1.0.0",
-  "description": "",
-  "main": "bee.js",
-  "keywords": [],
-  "author": "",
+  "version": "0.0.1",
+  "description": "makes web workers easier to use",
+  "main": "src/index.js",
+  "keywords": ["web-worker"],
+  "author": "jrc03c",
   "license": "ISC",
   "scripts": {
     "build": "node build.js",
