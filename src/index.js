@@ -176,7 +176,9 @@ const Bee = { Drone, Queen }
 
 if (typeof module !== "undefined") {
   module.exports = Bee
-} else if (typeof globalThis !== "undefined") {
+}
+
+if (typeof globalThis !== "undefined") {
   // eslint-disable-next-line no-undef
   globalThis.Bee = Bee
 }
