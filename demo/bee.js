@@ -5611,7 +5611,10 @@
           };
           const response = {
             send: function(result) {
-              result = JSON.parse(stringify(result));
+              try {
+                result = JSON.parse(stringify(result));
+              } catch (e) {
+              }
               postMessage({
                 path: cbid,
                 payload: result
@@ -5669,7 +5672,10 @@
           }
           return new Promise((resolve, reject) => {
             try {
-              payload = JSON.parse(stringify(payload));
+              try {
+                payload = JSON.parse(stringify(payload));
+              } catch (e) {
+              }
               const results = new Array(self.hive.length);
               const promises = self.hive.map(function(drone, i) {
                 return new Promise(function(innerResolve, innerReject) {

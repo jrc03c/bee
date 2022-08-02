@@ -9,6 +9,8 @@ module.exports = {
     ecmaVersion: "latest",
   },
   rules: {
+    allowEmptyCatch: true,
+
     "prefer-const": [
       "error",
       {
