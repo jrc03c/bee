@@ -11,6 +11,142 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
 
+  // node_modules/@jrc03c/js-text-tools/src/camelify.js
+  var require_camelify = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/camelify.js"(exports, module) {
+      function camelify(text) {
+        if (typeof text !== "string") {
+          throw new Error("`text` must be a string!");
+        }
+        text = text.trim();
+        let out = "";
+        let shouldCapitalizeNextCharacter = false;
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i];
+          if (char.match(/[A-Za-z0-9]/g)) {
+            if (out.length === 0) {
+              out += char.toLowerCase();
+            } else if (shouldCapitalizeNextCharacter) {
+              out += char.toUpperCase();
+            } else {
+              out += char;
+            }
+            shouldCapitalizeNextCharacter = false;
+          } else if (!char.includes("'") && !char.includes("\u2019") && !char.includes("\u275C")) {
+            shouldCapitalizeNextCharacter = true;
+          }
+        }
+        return out;
+      }
+      module.exports = camelify;
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/indent.js
+  var require_indent = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/indent.js"(exports, module) {
+      function indent(text, chars) {
+        chars = chars || "";
+        return text.split("\n").map((line) => {
+          if (line.trim().length > 0) {
+            return chars + line;
+          } else {
+            return line;
+          }
+        }).join("\n");
+      }
+      module.exports = indent;
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/helpers/replace-all.js
+  var require_replace_all = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/helpers/replace-all.js"(exports, module) {
+      function replaceAll(text, a, b) {
+        if (typeof text !== "string") {
+          throw new Error("`text` must be a string!");
+        }
+        if (typeof a !== "string") {
+          throw new Error("`a` must be a string!");
+        }
+        if (typeof b !== "string") {
+          throw new Error("`b` must be a string!");
+        }
+        return text.split(a).join(b);
+      }
+      module.exports = replaceAll;
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/helpers/strip.js
+  var require_strip = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/helpers/strip.js"(exports, module) {
+      var replaceAll = require_replace_all();
+      var alpha = "abcdefghijklmnopqrstuvwxyz1234567890";
+      var doubleSpace = "  ";
+      var singleSpace = " ";
+      function strip(text) {
+        if (typeof text !== "string") {
+          throw new Error("`text` must be a string!");
+        }
+        let out = "";
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i].toLowerCase();
+          if (alpha.includes(char)) {
+            out += char;
+          } else if (char === "'" || char === "\u2019" || char === "\u275C") {
+            out += "";
+          } else {
+            out += singleSpace;
+          }
+        }
+        while (out.includes(doubleSpace)) {
+          out = replaceAll(out, doubleSpace, singleSpace);
+        }
+        return out.trim();
+      }
+      module.exports = strip;
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/kebabify.js
+  var require_kebabify = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/kebabify.js"(exports, module) {
+      var strip = require_strip();
+      function kebabify(text) {
+        if (typeof text !== "string") {
+          throw new Error("`text` must be a string!");
+        }
+        const words = strip(text).split(" ");
+        if (words.length === 0)
+          return "";
+        if (words.length === 1)
+          return words[0];
+        return words.join("-");
+      }
+      module.exports = kebabify;
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/snakeify.js
+  var require_snakeify = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/snakeify.js"(exports, module) {
+      var strip = require_strip();
+      function snakeify(text) {
+        if (typeof text !== "string") {
+          throw new Error("`text` must be a string!");
+        }
+        const words = strip(text).split(" ");
+        if (words.length === 0)
+          return "";
+        if (words.length === 1)
+          return words[0];
+        return words.join("_");
+      }
+      module.exports = snakeify;
+    }
+  });
+
   // node_modules/@jrc03c/js-math-tools/src/math-error.js
   var require_math_error = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/math-error.js"(exports, module) {
@@ -5287,6 +5423,119 @@
     }
   });
 
+  // node_modules/@jrc03c/js-text-tools/src/stringify.js
+  var require_stringify = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/stringify.js"(exports, module) {
+      var { copy } = require_src();
+      function stringify(x, replacer, space) {
+        return JSON.stringify(copy(x), replacer, space);
+      }
+      module.exports = stringify;
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/unindent.js
+  var require_unindent = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/unindent.js"(exports, module) {
+      function unindent(text) {
+        const lines = text.split("\n");
+        const indentations = lines.filter((line) => line.trim().length > 0).map((line) => line.split("").findIndex((char) => !char.match(/\s/g)));
+        const minIndentation = Math.min(...indentations);
+        return lines.map((line) => line.substring(minIndentation)).join("\n");
+      }
+      module.exports = unindent;
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/wrap.js
+  var require_wrap = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/wrap.js"(exports, module) {
+      function wrap(raw, maxLineLength, hangingIndentPrefix) {
+        if (typeof raw !== "string") {
+          throw new Error(
+            "The first argument to the `wrap` function must be a string!"
+          );
+        }
+        if (typeof maxLineLength === "undefined" || maxLineLength === null) {
+          if (typeof process !== "undefined" && typeof process.stdout !== "undefined" && typeof process.stdout.columns === "number") {
+            maxLineLength = process.stdout.columns > 80 ? 80 : process.stdout.columns;
+          } else {
+            maxLineLength = 80;
+          }
+        }
+        if (isNaN(maxLineLength) || typeof maxLineLength !== "number") {
+          throw new Error(
+            "The second argument to the `wrap` function must be undefined, null, or an integer!"
+          );
+        }
+        if (typeof hangingIndentPrefix === "undefined") {
+          hangingIndentPrefix = "";
+        }
+        if (typeof hangingIndentPrefix !== "string") {
+          throw new Error(
+            "The third argument to the `wrap` function must be undefined, null, or a string!"
+          );
+        }
+        const out = [];
+        raw.split("\n").forEach((line) => {
+          if (line.trim().length === 0) {
+            return out.push("");
+          }
+          const indentation = line.split(/[^\s]/g)[0];
+          const words = line.replace(indentation, "").split(" ");
+          let temp = indentation;
+          let hasWrappedAtLeastOnce = false;
+          words.forEach((word) => {
+            const newLine = temp + (temp.trim().length > 0 ? " " : "") + word;
+            if (newLine.length > maxLineLength) {
+              out.push(temp);
+              temp = indentation + hangingIndentPrefix + word;
+              hasWrappedAtLeastOnce = true;
+            } else {
+              temp = newLine;
+            }
+          });
+          if (temp.length > 0) {
+            out.push(temp);
+          }
+        });
+        return out.join("\n");
+      }
+      module.exports = wrap;
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/index.js
+  var require_src2 = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/index.js"(exports, module) {
+      var out = {
+        camelify: require_camelify(),
+        indent: require_indent(),
+        kebabify: require_kebabify(),
+        snakeify: require_snakeify(),
+        stringify: require_stringify(),
+        unindent: require_unindent(),
+        wrap: require_wrap(),
+        dump() {
+          Object.keys(out).forEach((key) => {
+            if (typeof global !== "undefined") {
+              global[key] = out[key];
+            }
+            if (typeof window !== "undefined") {
+              window[key] = out[key];
+            }
+          });
+        }
+      };
+      if (typeof module !== "undefined") {
+        module.exports = out;
+      }
+      if (typeof window !== "undefined") {
+        window.JSTextTools = out;
+      }
+    }
+  });
+
   // node_modules/@jrc03c/make-key/index.js
   var require_make_key = __commonJS({
     "node_modules/@jrc03c/make-key/index.js"(exports, module) {
@@ -5317,26 +5566,24 @@
   });
 
   // src/index.js
-  var require_src2 = __commonJS({
+  var require_src3 = __commonJS({
     "src/index.js"(exports, module) {
+      var { stringify } = require_src2();
       var makeKey = require_make_key();
-      Array.prototype.remove = function(item) {
-        return this.filter((other) => other !== item);
-      };
       var SubscriptionService = class {
         constructor() {
-          let self = this;
+          const self = this;
           self.subscriptions = {};
         }
         on(path, callback) {
-          let self = this;
+          const self = this;
           if (!self.subscriptions[path])
             self.subscriptions[path] = [];
           self.subscriptions[path].push(callback);
           return self;
         }
         off(path, callback) {
-          let self = this;
+          const self = this;
           self.subscriptions[path].splice(
             self.subscriptions[path].indexOf(callback),
             1
@@ -5344,8 +5591,8 @@
           return self;
         }
         run(path, payload) {
-          let self = this;
-          let callbacks = self.subscriptions[path];
+          const self = this;
+          const callbacks = self.subscriptions[path];
           if (callbacks)
             callbacks.forEach((cb) => cb(payload));
           return self;
@@ -5354,23 +5601,24 @@
       var Drone = class extends SubscriptionService {
         constructor() {
           super();
-          let self = this;
+          const self = this;
           onmessage = (event) => self.run(event.data.path, event.data.payload, event.data.cbid);
         }
         run(path, payload, cbid) {
-          let self = this;
-          let request = {
+          const self = this;
+          const request = {
             data: payload
           };
-          let response = {
+          const response = {
             send: function(result) {
+              result = JSON.parse(stringify(result));
               postMessage({
                 path: cbid,
                 payload: result
               });
             }
           };
-          let callbacks = self.subscriptions[path];
+          const callbacks = self.subscriptions[path];
           if (callbacks)
             callbacks.forEach((cb) => cb(request, response));
           else
@@ -5381,38 +5629,38 @@
       var Queen = class extends SubscriptionService {
         constructor(filename, n) {
           super();
-          let self = this;
+          const self = this;
           self.hive = [];
           if (filename) {
             self.addDrones(filename, n || 1);
           }
         }
         addDrone(filename) {
-          let self = this;
-          let drone = new Worker(filename);
+          const self = this;
+          const drone = new Worker(filename);
           drone.onmessage = (event) => super.run(event.data.path, event.data.payload);
           self.hive.push(drone);
           return drone;
         }
         addDrones(filename, n) {
-          let self = this;
+          const self = this;
           for (let i = 0; i < n; i++)
             self.addDrone(filename);
           return self;
         }
         removeDrone(drone) {
-          let self = this;
-          self.hive = self.hive.remove(drone);
+          const self = this;
+          self.hive = self.hive.filter((other) => other !== drone);
           drone.terminate();
           return self;
         }
         removeDrones(drones) {
-          let self = this;
+          const self = this;
           drones.forEach((drone) => self.removeDrone(drone));
           return self;
         }
         run(path, payload) {
-          let self = this;
+          const self = this;
           if (self.hive.length === 0) {
             console.warn(
               "The queen issued a command, but there are no drones in the hive! Use the queen's `addDrone` method to add a drone to the hive! (https://github.com/jrc03c/bee.js)"
@@ -5421,11 +5669,12 @@
           }
           return new Promise((resolve, reject) => {
             try {
-              let results = new Array(self.hive.length);
-              let promises = self.hive.map(function(drone, i) {
+              payload = JSON.parse(stringify(payload));
+              const results = new Array(self.hive.length);
+              const promises = self.hive.map(function(drone, i) {
                 return new Promise(function(innerResolve, innerReject) {
                   try {
-                    let cbid = makeKey(32);
+                    const cbid = makeKey(32);
                     self.on(cbid, (result) => {
                       self.off(cbid, this);
                       results[i] = result;
@@ -5449,33 +5698,32 @@
           });
         }
         command(path, payload) {
-          let self = this;
+          const self = this;
           return self.run(path, payload);
         }
         kill() {
-          let self = this;
+          const self = this;
           self.stop();
           self.removeDrones(self.hive);
           return null;
         }
         stop() {
-          let self = this;
+          const self = this;
           self.hive.forEach((drone) => drone.terminate());
           return self;
         }
         terminate() {
-          let self = this;
+          const self = this;
           return self.stop();
         }
       };
       var Bee = { Drone, Queen };
       if (typeof module !== "undefined") {
         module.exports = Bee;
-      }
-      if (typeof globalThis !== "undefined") {
+      } else if (typeof globalThis !== "undefined") {
         globalThis.Bee = Bee;
       }
     }
   });
-  require_src2();
+  require_src3();
 })();
