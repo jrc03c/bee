@@ -41,7 +41,7 @@ Of course, nothing will happen yet because we haven't actually defined what's in
 importScripts("path/to/bee.js")
 const drone = new Bee.Drone()
 
-drone.on("double", function(request, response){
+drone.on("double", function (request, response) {
   let x = request.data
   return response.send(x * 2)
 })

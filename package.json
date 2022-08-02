@@ -5,5 +5,19 @@
   "main": "bee.js",
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "scripts": {
+    "build": "node build.js",
+    "watch": "node build.js --watch"
+  },
+  "dependencies": {
+    "@jrc03c/js-math-tools": "github:jrc03c/js-math-tools",
+    "@jrc03c/js-text-tools": "github:jrc03c/js-text-tools",
+    "@jrc03c/make-key": "github:jrc03c/make-key"
+  },
+  "devDependencies": {
+    "@jrc03c/watch": "github:jrc03c/watch",
+    "esbuild": "^0.14.51",
+    "eslint": "^8.21.0"
+  }
 }
