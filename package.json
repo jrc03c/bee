@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "description": "makes web workers easier to use",
   "main": "src/index.js",
-  "keywords": ["web-worker"],
+  "keywords": [
+    "web-worker"
+  ],
   "author": "jrc03c",
   "license": "ISC",
   "scripts": {
