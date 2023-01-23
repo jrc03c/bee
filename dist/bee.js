@@ -174,6 +174,20 @@
     }
   });
 
+  // node_modules/@jrc03c/js-math-tools/src/copy.js
+  var require_copy = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/copy.js"(exports, module) {
+      function copy(x) {
+        try {
+          return structuredClone(x);
+        } catch (e) {
+          return x;
+        }
+      }
+      module.exports = copy;
+    }
+  });
+
   // node_modules/@jrc03c/js-math-tools/src/is-array.js
   var require_is_array = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/is-array.js"(exports, module) {
@@ -199,6 +213,53 @@
         }
       }
       module.exports = isDataFrame;
+    }
+  });
+
+  // node_modules/@jrc03c/js-math-tools/src/is-series.js
+  var require_is_series = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/is-series.js"(exports, module) {
+      function isSeries(x) {
+        try {
+          return !!x._symbol && x._symbol === Symbol.for("@jrc03c/js-math-tools/series");
+        } catch (e) {
+          return false;
+        }
+      }
+      module.exports = isSeries;
+    }
+  });
+
+  // node_modules/@jrc03c/js-math-tools/src/flatten.js
+  var require_flatten = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/flatten.js"(exports, module) {
+      var assert = require_assert();
+      var copy = require_copy();
+      var isArray = require_is_array();
+      var isDataFrame = require_is_dataframe();
+      var isSeries = require_is_series();
+      function flatten(arr) {
+        if (isDataFrame(arr) || isSeries(arr)) {
+          return flatten(arr.values);
+        }
+        assert(
+          isArray(arr),
+          "The `flatten` function only works on arrays, Series, and DataFrames!"
+        );
+        function helper(arr2) {
+          let out = [];
+          copy(arr2).forEach((child) => {
+            if (isArray(child)) {
+              out = out.concat(helper(child));
+            } else {
+              out.push(child);
+            }
+          });
+          return out;
+        }
+        return helper(arr);
+      }
+      module.exports = flatten;
     }
   });
 
@@ -241,20 +302,6 @@
         return typeof x === "object" && !isUndefined(x) && !isArray(x);
       }
       module.exports = isObject;
-    }
-  });
-
-  // node_modules/@jrc03c/js-math-tools/src/is-series.js
-  var require_is_series = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/is-series.js"(exports, module) {
-      function isSeries(x) {
-        try {
-          return !!x._symbol && x._symbol === Symbol.for("@jrc03c/js-math-tools/series");
-        } catch (e) {
-          return false;
-        }
-      }
-      module.exports = isSeries;
     }
   });
 
@@ -350,14 +397,15 @@
     }
   });
 
-  // node_modules/@jrc03c/js-math-tools/src/copy.js
-  var require_copy = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/copy.js"(exports, module) {
+  // node_modules/@jrc03c/js-math-tools/src/is-equal.js
+  var require_is_equal = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/is-equal.js"(exports, module) {
+      var copy = require_copy();
       var indexOf = require_index_of();
       var isArray = require_is_array();
       var isDataFrame = require_is_dataframe();
       var isSeries = require_is_series();
-      function copy(x) {
+      function uncircularCopy(x) {
         function helper(x2, checked, currentPath) {
           if (isDataFrame(x2) || isSeries(x2)) {
             return x2.copy();
@@ -399,47 +447,6 @@
         const orig = x;
         return helper(x);
       }
-      module.exports = copy;
-    }
-  });
-
-  // node_modules/@jrc03c/js-math-tools/src/flatten.js
-  var require_flatten = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/flatten.js"(exports, module) {
-      var assert = require_assert();
-      var copy = require_copy();
-      var isArray = require_is_array();
-      var isDataFrame = require_is_dataframe();
-      var isSeries = require_is_series();
-      function flatten(arr) {
-        if (isDataFrame(arr) || isSeries(arr)) {
-          return flatten(arr.values);
-        }
-        assert(
-          isArray(arr),
-          "The `flatten` function only works on arrays, Series, and DataFrames!"
-        );
-        function helper(arr2) {
-          let out = [];
-          copy(arr2).forEach((child) => {
-            if (isArray(child)) {
-              out = out.concat(helper(child));
-            } else {
-              out.push(child);
-            }
-          });
-          return out;
-        }
-        return helper(arr);
-      }
-      module.exports = flatten;
-    }
-  });
-
-  // node_modules/@jrc03c/js-math-tools/src/is-equal.js
-  var require_is_equal = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/is-equal.js"(exports, module) {
-      var copy = require_copy();
       function isEqual(a, b) {
         function helper(a2, b2) {
           const aType = typeof a2;
@@ -479,7 +486,11 @@
             }
           }
         }
-        return helper(copy(a), copy(b));
+        try {
+          return helper(copy(a), copy(b));
+        } catch (e) {
+          return helper(uncircularCopy(a), uncircularCopy(b));
+        }
       }
       module.exports = isEqual;
     }
@@ -5848,22 +5859,22 @@
         zeros: require_zeros(),
         zip: require_zip(),
         dump: function() {
-          const public2 = typeof global !== "undefined" ? global : window;
-          if (!public2) {
+          const pub = typeof global !== "undefined" ? global : window;
+          if (!pub) {
             throw new out.MathError(
               "Cannot dump functions into global scope because neither `global` nor `window` exist in the current context!"
             );
           }
           Object.keys(out).forEach((key) => {
             try {
-              Object.defineProperty(public2, key, {
+              Object.defineProperty(pub, key, {
                 configurable: false,
                 enumerable: true,
                 writable: false,
                 value: out[key]
               });
             } catch (e) {
-              public2[key] = out[key];
+              pub[key] = out[key];
             }
           });
         }
