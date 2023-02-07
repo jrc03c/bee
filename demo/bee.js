@@ -397,19 +397,16 @@
     }
   });
 
-  // node_modules/@jrc03c/js-math-tools/src/is-equal.js
-  var require_is_equal = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/is-equal.js"(exports, module) {
+  // node_modules/@jrc03c/js-math-tools/src/decycle.js
+  var require_decycle = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/decycle.js"(exports, module) {
       var copy = require_copy();
       var indexOf = require_index_of();
       var isArray = require_is_array();
       var isDataFrame = require_is_dataframe();
       var isSeries = require_is_series();
-      function uncircularCopy(x) {
+      module.exports = function decycle(x) {
         function helper(x2, checked, currentPath) {
-          if (isDataFrame(x2) || isSeries(x2)) {
-            return x2.copy();
-          }
           checked = checked || [];
           currentPath = currentPath || "";
           if (checked.indexOf(x2) > -1) {
@@ -434,19 +431,41 @@
             if (isArray(x2)) {
               return x2.map((v, i) => helper(v, checked, currentPath + "/" + i));
             } else {
-              const out = {};
               Object.keys(x2).forEach((key) => {
-                out[key] = helper(x2[key], checked, currentPath + "/" + key);
+                x2[key] = helper(x2[key], checked, currentPath + "/" + key);
               });
-              return out;
+              return x2;
             }
           } else {
             return x2;
           }
         }
-        const orig = x;
-        return helper(x);
-      }
+        const orig = copy(x);
+        let out = helper(orig);
+        if (isDataFrame(x)) {
+          const temp = x.copy();
+          temp._values = out.values;
+          temp._columns = out.columns;
+          temp._index = out.index;
+          out = temp;
+        }
+        if (isSeries(x)) {
+          const temp = x.copy();
+          temp.name = out.name;
+          temp._values = out.values;
+          temp._index = out.index;
+          out = temp;
+        }
+        return out;
+      };
+    }
+  });
+
+  // node_modules/@jrc03c/js-math-tools/src/is-equal.js
+  var require_is_equal = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/is-equal.js"(exports, module) {
+      var copy = require_copy();
+      var decycle = require_decycle();
       function isEqual(a, b) {
         function helper(a2, b2) {
           const aType = typeof a2;
@@ -489,7 +508,7 @@
         try {
           return helper(copy(a), copy(b));
         } catch (e) {
-          return helper(uncircularCopy(a), uncircularCopy(b));
+          return helper(decycle(a), decycle(b));
         }
       }
       module.exports = isEqual;
@@ -1488,234 +1507,6 @@
     }
   });
 
-  // node_modules/@jrc03c/js-math-tools/src/is-boolean.js
-  var require_is_boolean = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/is-boolean.js"(exports, module) {
-      function isBoolean(x) {
-        return typeof x === "boolean";
-      }
-      module.exports = isBoolean;
-    }
-  });
-
-  // node_modules/@jrc03c/js-math-tools/src/max.js
-  var require_max = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/max.js"(exports, module) {
-      var assert = require_assert();
-      var flatten = require_flatten();
-      var isArray = require_is_array();
-      var isDataFrame = require_is_dataframe();
-      var isSeries = require_is_series();
-      function max(arr) {
-        if (isDataFrame(arr) || isSeries(arr)) {
-          return max(arr.values);
-        }
-        assert(
-          isArray(arr),
-          "The `max` function only works on arrays, Series, and DataFrames!"
-        );
-        try {
-          return Math.max(...flatten(arr));
-        } catch (e) {
-          return NaN;
-        }
-      }
-      module.exports = max;
-    }
-  });
-
-  // node_modules/@jrc03c/js-math-tools/src/dataframe/df-from-csv-string.js
-  var require_df_from_csv_string = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/dataframe/df-from-csv-string.js"(exports, module) {
-      var MathError = require_math_error();
-      var assert = require_assert();
-      var isArray = require_is_array();
-      var isBoolean = require_is_boolean();
-      var isString = require_is_string();
-      var isUndefined = require_is_undefined();
-      var max = require_max();
-      var range = require_range();
-      function fromCSVString(DataFrame, raw, hasHeaderRow, hasIndexColumn, fieldDelimiter, stringDelimiter) {
-        hasHeaderRow = (() => {
-          if (isUndefined(hasHeaderRow)) {
-            return false;
-          } else if (isBoolean(hasHeaderRow)) {
-            return hasHeaderRow;
-          }
-          throw new MathError(
-            "The `hasHeaderRow` parameter of the `fromCSV` method must be a boolean!"
-          );
-        })();
-        hasIndexColumn = (() => {
-          if (isUndefined(hasIndexColumn)) {
-            return false;
-          } else if (isBoolean(hasIndexColumn)) {
-            return hasIndexColumn;
-          }
-          throw new MathError(
-            "The `hasIndexColumn` parameter of the `fromCSV` method must be a boolean!"
-          );
-        })();
-        fieldDelimiter = (() => {
-          const errorMessage = "The `fieldDelimiter` parameter of the `fromCSV` method must be one of:\n\n1) a single-character string (e.g., ',')\n2) an array containing two single-character strings, one each for a left delimiter and a right delimiter (e.g., ['<', '>'])";
-          if (isUndefined(fieldDelimiter)) {
-            return ",";
-          } else if (isString(fieldDelimiter)) {
-            assert(fieldDelimiter.length === 1, errorMessage);
-            return fieldDelimiter;
-          } else if (isArray(fieldDelimiter)) {
-            assert(fieldDelimiter.length === 2, errorMessage);
-            assert(fieldDelimiter[0].length === 1, errorMessage);
-            assert(fieldDelimiter[1].length === 1, errorMessage);
-            return fieldDelimiter;
-          } else {
-            throw new MathError(errorMessage);
-          }
-        })();
-        stringDelimiter = (() => {
-          const errorMessage = "The `stringDelimiter` parameter of the `fromCSV` method must be one of:\n\n1) a single-character string (e.g., '\"')\n2) an array containing two single-character strings, one each for a left delimiter and a right delimiter (e.g., ['\u201C', '\u201D'])";
-          if (isUndefined(stringDelimiter)) {
-            return '"';
-          } else if (isString(stringDelimiter)) {
-            assert(stringDelimiter.length === 1, errorMessage);
-            return stringDelimiter;
-          } else if (isArray(stringDelimiter)) {
-            assert(stringDelimiter.length === 2, errorMessage);
-            assert(stringDelimiter[0].length === 1, errorMessage);
-            assert(stringDelimiter[1].length === 1, errorMessage);
-            return stringDelimiter;
-          } else {
-            throw new MathError(errorMessage);
-          }
-        })();
-        const out = (() => {
-          const lines = raw.split("\n").filter((line) => line.length > 0);
-          const rows = lines.map((line) => {
-            const row = [];
-            let temp2 = "";
-            let isInQuotes = false;
-            for (let i = 0; i < line.length; i++) {
-              const char = line[i];
-              if (char.match(/\\/g)) {
-                i++;
-              } else if (isArray(stringDelimiter) && char === stringDelimiter[0]) {
-                isInQuotes = true;
-              } else if (isArray(stringDelimiter) && char === stringDelimiter[1]) {
-                isInQuotes = false;
-              } else if (isString(stringDelimiter) && char === stringDelimiter) {
-                isInQuotes = !isInQuotes;
-              } else if (isArray(fieldDelimiter) && char === fieldDelimiter[0] || isArray(fieldDelimiter) && char === fieldDelimiter[1] || isString(fieldDelimiter) && char === fieldDelimiter) {
-                if (!isInQuotes) {
-                  const value = temp2;
-                  try {
-                    const parsedValue = JSON.parse(value);
-                    if (isArray(parsedValue)) {
-                      row.push(value.trim());
-                    } else {
-                      row.push(parsedValue);
-                    }
-                  } catch (e) {
-                    row.push(value.trim());
-                  }
-                  temp2 = "";
-                } else {
-                  temp2 += char;
-                }
-              } else {
-                temp2 += char;
-              }
-            }
-            if (temp2.length > 0) {
-              const value = temp2;
-              try {
-                const parsedValue = JSON.parse(value);
-                if (isArray(parsedValue)) {
-                  row.push(value.trim());
-                } else {
-                  row.push(parsedValue);
-                }
-              } catch (e) {
-                row.push(value.trim());
-              }
-            }
-            return row;
-          });
-          const columns = (() => {
-            const temp2 = hasHeaderRow ? rows.shift() : range(0, rows[0].length).map((i) => "col" + i);
-            if (hasIndexColumn) {
-              temp2.shift();
-            }
-            return temp2;
-          })();
-          const index = (() => {
-            const temp2 = hasIndexColumn ? rows.map((row) => row.shift()) : range(0, rows.length).map((i) => "row" + i);
-            return temp2;
-          })();
-          const maxRowLength = max(rows.map((row) => row.length));
-          const temp = new DataFrame(
-            rows.map((row) => {
-              row.length = maxRowLength;
-              return row;
-            })
-          );
-          if (hasHeaderRow)
-            temp.columns = columns;
-          if (hasIndexColumn)
-            temp.index = index;
-          return temp;
-        })();
-        return out;
-      }
-      module.exports = fromCSVString;
-    }
-  });
-
-  // node_modules/@jrc03c/js-math-tools/src/dataframe/df-from-csv.js
-  var require_df_from_csv = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/dataframe/df-from-csv.js"(exports, module) {
-      var MathError = require_math_error();
-      var assert = require_assert();
-      var dfFromCSVString = require_df_from_csv_string();
-      var isString = require_is_string();
-      var isUndefined = require_is_undefined();
-      async function fromCSV(DataFrame, path, encoding, hasHeaderRow, hasIndexColumn, fieldDelimiter, stringDelimiter) {
-        encoding = (() => {
-          if (!isUndefined(encoding)) {
-            assert(
-              isString(encoding),
-              "The `encoding` parameter of the `fromCSV` method must be a string (e.g., 'utf8')!"
-            );
-            return encoding;
-          } else {
-            return "utf8";
-          }
-        })();
-        const raw = await (async () => {
-          try {
-            const fs = __require("fs");
-            return fs.readFileSync(path, encoding);
-          } catch (e) {
-          }
-          try {
-            const response = await fetch(path);
-            return await response.text();
-          } catch (e) {
-          }
-          throw new MathError(`The path "${path}" could not be loaded!`);
-        })();
-        return dfFromCSVString(
-          DataFrame,
-          raw,
-          hasHeaderRow,
-          hasIndexColumn,
-          fieldDelimiter,
-          stringDelimiter
-        );
-      }
-      module.exports = fromCSV;
-    }
-  });
-
   // node_modules/@jrc03c/js-math-tools/src/dataframe/df-get.js
   var require_df_get = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/dataframe/df-get.js"(exports, module) {
@@ -2362,6 +2153,16 @@
     }
   });
 
+  // node_modules/@jrc03c/js-math-tools/src/is-boolean.js
+  var require_is_boolean = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/is-boolean.js"(exports, module) {
+      function isBoolean(x) {
+        return typeof x === "boolean";
+      }
+      module.exports = isBoolean;
+    }
+  });
+
   // node_modules/@jrc03c/js-math-tools/src/dataframe/df-sort.js
   var require_df_sort = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/dataframe/df-sort.js"(exports, module) {
@@ -2493,95 +2294,6 @@
         return out;
       }
       module.exports = dfSort;
-    }
-  });
-
-  // node_modules/@jrc03c/js-math-tools/src/dataframe/df-to-csv-string.js
-  var require_df_to_csv_string = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/dataframe/df-to-csv-string.js"(exports, module) {
-      var MathError = require_math_error();
-      var isBoolean = require_is_boolean();
-      var isObject = require_is_object();
-      var isString = require_is_string();
-      var isUndefined = require_is_undefined();
-      function toCSVString(df, shouldIncludeIndex) {
-        shouldIncludeIndex = (() => {
-          if (isUndefined(shouldIncludeIndex)) {
-            return true;
-          } else if (isBoolean(shouldIncludeIndex)) {
-            return shouldIncludeIndex;
-          }
-          throw new MathError(
-            "The `shouldIncludeIndex` parameter of the `toCSVString` method must be a boolean!"
-          );
-        })();
-        const index = [""].concat(df.index);
-        const out = [df.columns].concat(df.values).map((row, i) => {
-          const temp = shouldIncludeIndex ? [index[i]] : [];
-          return temp.concat(row).map((value) => {
-            if (isString(value)) {
-              return JSON.stringify(value);
-            } else if (isObject(value)) {
-              return JSON.stringify(JSON.stringify(value));
-            } else if (isUndefined(value)) {
-              return "";
-            } else {
-              return value.toString();
-            }
-          }).join(",");
-        }).join("\n");
-        return out;
-      }
-      module.exports = toCSVString;
-    }
-  });
-
-  // node_modules/@jrc03c/js-math-tools/src/dataframe/df-to-csv.js
-  var require_df_to_csv = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/dataframe/df-to-csv.js"(exports, module) {
-      var MathError = require_math_error();
-      var dfToCSVString = require_df_to_csv_string();
-      function toCSV(df, filename, shouldIncludeIndex) {
-        const out = dfToCSVString(df, shouldIncludeIndex);
-        let downloadedInBrowser = false;
-        let wroteToDiskInNode = false;
-        let browserError, nodeError;
-        try {
-          let newFilename = filename;
-          if (filename.includes("/")) {
-            const parts = filename.split("/");
-            newFilename = parts[parts.length - 1];
-          }
-          const a = document.createElement("a");
-          a.href = `data:text/csv;charset=utf-8,${encodeURIComponent(out)}`;
-          a.download = newFilename;
-          a.dispatchEvent(new MouseEvent("click"));
-          downloadedInBrowser = true;
-        } catch (e) {
-          browserError = e;
-        }
-        try {
-          const fs = __require("fs");
-          const path = __require("path");
-          fs.writeFileSync(path.resolve(filename), out, "utf8");
-          wroteToDiskInNode = true;
-        } catch (e) {
-          nodeError = e;
-        }
-        if (!downloadedInBrowser && !wroteToDiskInNode) {
-          if (typeof window !== "undefined") {
-            throw new MathError(browserError);
-          } else if (typeof module !== "undefined") {
-            throw new MathError(nodeError);
-          } else {
-            throw new MathError(
-              "I don't know what's going wrong, but it doesn't seem like you're in Node or the browser, and we couldn't download and/or write the file to disk!"
-            );
-          }
-        }
-        return df;
-      }
-      module.exports = toCSV;
     }
   });
 
@@ -3390,8 +3102,6 @@
       var dfDropMissing = require_df_drop_missing();
       var dfDropNaN = require_df_drop_nan();
       var dfFilter = require_df_filter();
-      var dfFromCSV = require_df_from_csv();
-      var dfFromCSVString = require_df_from_csv_string();
       var dfGet = require_df_get();
       var dfGetDummies = require_df_get_dummies();
       var dfGetSubsetByIndices = require_df_get_subset_by_indices();
@@ -3400,8 +3110,6 @@
       var dfResetIndex = require_df_reset_index();
       var dfShuffle = require_df_shuffle();
       var dfSort = require_df_sort();
-      var dfToCSV = require_df_to_csv();
-      var dfToCSVString = require_df_to_csv_string();
       var dfToJSON = require_df_to_json();
       var dfToJSONString = require_df_to_json_string();
       var dfToObject = require_df_to_object();
@@ -3726,14 +3434,6 @@
           const self = this;
           return dfToObject(self, axis);
         }
-        toCSVString(shouldIncludeIndex) {
-          const self = this;
-          return dfToCSVString(self, shouldIncludeIndex);
-        }
-        saveAsCSV(filename, shouldIncludeIndex) {
-          const self = this;
-          return dfToCSV(self, filename, shouldIncludeIndex);
-        }
         toJSONString(axis) {
           const self = this;
           return dfToJSONString(self, axis);
@@ -3779,14 +3479,34 @@
           return JSON.stringify(self);
         }
       };
-      DataFrame.fromCSV = function() {
-        return dfFromCSV(DataFrame, ...arguments);
-      };
-      DataFrame.fromCSVString = function() {
-        return dfFromCSVString(DataFrame, ...arguments);
-      };
       var Series = require_series()(DataFrame);
       module.exports = { DataFrame, Series };
+    }
+  });
+
+  // node_modules/@jrc03c/js-math-tools/src/max.js
+  var require_max = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/max.js"(exports, module) {
+      var assert = require_assert();
+      var flatten = require_flatten();
+      var isArray = require_is_array();
+      var isDataFrame = require_is_dataframe();
+      var isSeries = require_is_series();
+      function max(arr) {
+        if (isDataFrame(arr) || isSeries(arr)) {
+          return max(arr.values);
+        }
+        assert(
+          isArray(arr),
+          "The `max` function only works on arrays, Series, and DataFrames!"
+        );
+        try {
+          return Math.max(...flatten(arr));
+        } catch (e) {
+          return NaN;
+        }
+      }
+      module.exports = max;
     }
   });
 
@@ -4442,6 +4162,20 @@
         }
       }
       module.exports = vectorize(cos);
+    }
+  });
+
+  // node_modules/@jrc03c/js-math-tools/src/helpers/data-types.js
+  var require_data_types = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/helpers/data-types.js"(exports, module) {
+      module.exports = Object.freeze({
+        boolean: "boolean",
+        date: "date",
+        null: "null",
+        number: "number",
+        object: "object",
+        string: "string"
+      });
     }
   });
 
@@ -5151,6 +4885,154 @@
     }
   });
 
+  // node_modules/@jrc03c/js-math-tools/src/helpers/boolean-values.js
+  var require_boolean_values = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/helpers/boolean-values.js"(exports, module) {
+      module.exports = ["true", "false", "yes", "no"];
+    }
+  });
+
+  // node_modules/@jrc03c/js-math-tools/src/helpers/null-values.js
+  var require_null_values = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/helpers/null-values.js"(exports, module) {
+      module.exports = ["null", "none", "nan", "na", "n/a", "", "undefined"];
+    }
+  });
+
+  // node_modules/@jrc03c/js-math-tools/src/cast.js
+  var require_cast = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/cast.js"(exports, module) {
+      var isArray = require_is_array();
+      var nullValues = require_null_values();
+      function cast(value, type) {
+        if (value === void 0) {
+          value = "undefined";
+        }
+        if (type === "null") {
+          return null;
+        }
+        if (type === "number") {
+          const out = parseFloat(value);
+          if (isNaN(out))
+            return NaN;
+          return out;
+        }
+        if (type === "boolean") {
+          try {
+            const vBool = value.trim().toLowerCase();
+            if (vBool === "true" || vBool === "yes") {
+              return true;
+            }
+            if (vBool === "false" || vBool === "no") {
+              return false;
+            }
+          } catch (e) {
+          }
+          return null;
+        }
+        if (type === "date") {
+          const out = new Date(value);
+          if (out.toString() === "Invalid Date")
+            return null;
+          return out;
+        }
+        if (type === "object") {
+          try {
+            const out = JSON.parse(value);
+            if (isArray(out))
+              return null;
+            return out;
+          } catch (e) {
+            return null;
+          }
+        }
+        if (type === "string") {
+          try {
+            if (nullValues.indexOf(value.trim().toLowerCase()) > -1)
+              return null;
+          } catch (e) {
+            return null;
+          }
+          return value;
+        }
+      }
+      module.exports = cast;
+    }
+  });
+
+  // node_modules/@jrc03c/js-math-tools/src/infer-type.js
+  var require_infer_type = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/infer-type.js"(exports, module) {
+      var apply = require_apply();
+      var assert = require_assert();
+      var booleanValues = require_boolean_values();
+      var cast = require_cast();
+      var count = require_count();
+      var flatten = require_flatten();
+      var isArray = require_is_array();
+      var isDataFrame = require_is_dataframe();
+      var isNumber = require_is_number();
+      var isSeries = require_is_series();
+      var isString = require_is_string();
+      var nullValues = require_null_values();
+      function inferType(arr) {
+        if (isDataFrame(arr)) {
+          const out = arr.copy();
+          const results = inferType(arr.values);
+          out.values = results.values;
+          return { type: results.type, values: out };
+        }
+        if (isSeries(arr)) {
+          const out = arr.copy();
+          const results = inferType(arr.values);
+          out.values = results.values;
+          return { type: results.type, values: out };
+        }
+        assert(
+          isArray(arr),
+          "The `inferType` function only works on arrays, Series, and DataFrames!"
+        );
+        const types = flatten(arr).map((v) => {
+          if (v === void 0)
+            return "null";
+          if (!isString(v)) {
+            v = JSON.stringify(v);
+          }
+          const vLower = v.toLowerCase();
+          const vLowerTrimmed = vLower.trim();
+          if (nullValues.indexOf(vLowerTrimmed) > -1) {
+            return "null";
+          }
+          if (booleanValues.indexOf(vLowerTrimmed) > -1) {
+            return "boolean";
+          }
+          try {
+            const vParsed = JSON.parse(v);
+            if (isNumber(vParsed)) {
+              return "number";
+            }
+            if (typeof vParsed === "object") {
+              if (isArray(vParsed))
+                return "string";
+              return "object";
+            }
+            return "string";
+          } catch (e) {
+            const vDate = new Date(v);
+            if (vDate.toString() !== "Invalid Date") {
+              return "date";
+            }
+            return "string";
+          }
+        });
+        const counts = count(types).sort((a, b) => b.count - a.count);
+        const primaryType = counts[0].item;
+        return { type: primaryType, values: apply(arr, (v) => cast(v, primaryType)) };
+      }
+      module.exports = inferType;
+    }
+  });
+
   // node_modules/@jrc03c/js-math-tools/src/int.js
   var require_int = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/int.js"(exports, module) {
@@ -5778,6 +5660,8 @@
         count: require_count(),
         covariance: require_covariance(),
         DataFrame,
+        dataTypes: require_data_types(),
+        decycle: require_decycle(),
         diff: require_diff(),
         distance: require_distance(),
         divide: require_divide(),
@@ -5796,6 +5680,7 @@
         floor: require_floor(),
         identity: require_identity(),
         indexOf: require_index_of(),
+        inferType: require_infer_type(),
         int: require_int(),
         intersect: require_intersect(),
         inverse: require_inverse(),

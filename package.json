@@ -10,7 +10,8 @@
   "license": "ISC",
   "scripts": {
     "build": "node build.js",
-    "watch": "node build.js --watch"
+    "watch": "node build.js --watch",
+		"pub": "npm version patch --force && npm publish --access=public"
   },
   "dependencies": {
     "@jrc03c/js-math-tools": "github:jrc03c/js-math-tools",
