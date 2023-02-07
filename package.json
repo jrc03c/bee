@@ -1,6 +1,6 @@
 {
   "name": "@jrc03c/bee",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "makes web workers easier to use",
   "main": "src/index.js",
   "keywords": [
@@ -11,7 +11,7 @@
   "scripts": {
     "build": "node build.js",
     "watch": "node build.js --watch",
-		"pub": "npm version patch --force && npm publish --access=public"
+    "pub": "npm version patch --force && npm publish --access=public"
   },
   "dependencies": {
     "@jrc03c/js-math-tools": "github:jrc03c/js-math-tools",
