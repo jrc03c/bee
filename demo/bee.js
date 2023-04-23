@@ -78,11 +78,18 @@
     }
   });
 
+  // node_modules/@jrc03c/js-text-tools/src/helpers/punctuation.js
+  var require_punctuation = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/helpers/punctuation.js"(exports, module) {
+      module.exports = "!\"#%&'()*+,-./:;<=>?@[]^_`{|}~\xA0\xA1\xA4\xA7\xA9\xAA\xAB\xAE\xB0\xB1\xB6\xB7\xBA\xBB\xBF\xD7\xF7\u0254\u0300\u0301\u0302\u0303\u037E\u0387\u055A\u055B\u055C\u055D\u055E\u055F\u0589\u058A\u05BE\u05C0\u05C3\u05C6\u05F3\u05F4\u0609\u060A\u060C\u060D\u061B\u061E\u061F\u066A\u066B\u066C\u066D\u06D4\u0700\u0701\u0702\u0703\u0704\u0705\u0706\u0707\u0708\u0709\u070A\u070B\u070C\u070D\u07F7\u07F8\u07F9\u0830\u0831\u0832\u0833\u0834\u0835\u0836\u0837\u0838\u0839\u083A\u083B\u083C\u083D\u083E\u085E\u0964\u0965\u0970\u09FD\u0A76\u0AF0\u0C77\u0C84\u0DF4\u0E4F\u0E5A\u0E5B\u0F04\u0F05\u0F06\u0F07\u0F08\u0F09\u0F0A\u0F0B\u0F0C\u0F0D\u0F0E\u0F0F\u0F10\u0F11\u0F12\u0F14\u0F3A\u0F3B\u0F3C\u0F3D\u0F85\u0FD0\u0FD1\u0FD2\u0FD3\u0FD4\u0FD9\u0FDA\u104A\u104B\u104C\u104D\u104E\u104F\u10FB\u1360\u1361\u1362\u1363\u1364\u1365\u1366\u1367\u1368\u1400\u166E\u169B\u169C\u16EB\u16EC\u16ED\u1735\u1736\u17D4\u17D5\u17D6\u17D8\u17D9\u17DA\u1800\u1801\u1802\u1803\u1804\u1805\u1806\u1807\u1808\u1809\u180A\u1944\u1945\u1A1E\u1A1F\u1AA0\u1AA1\u1AA2\u1AA3\u1AA4\u1AA5\u1AA6\u1AA8\u1AA9\u1AAA\u1AAB\u1AAC\u1AAD\u1B5A\u1B5B\u1B5C\u1B5D\u1B5E\u1B5F\u1B60\u1BFC\u1BFD\u1BFE\u1BFF\u1C3B\u1C3C\u1C3D\u1C3E\u1C3F\u1C7E\u1C7F\u1CC0\u1CC1\u1CC2\u1CC3\u1CC4\u1CC5\u1CC6\u1CC7\u1CD3\u2010\u2011\u2012\u2013\u2014\u2015\u2016\u2017\u2018\u2019\u201A\u201B\u201C\u201D\u201E\u201F\u2020\u2021\u2022\u2023\u2024\u2025\u2026\u2027\u2030\u2031\u2032\u2033\u2034\u2035\u2036\u2037\u2038\u2039\u203A\u203B\u203C\u203D\u203E\u203F\u2040\u2041\u2042\u2043\u2045\u2046\u2047\u2048\u2049\u204A\u204B\u204C\u204D\u204E\u204F\u2050\u2051\u2052\u2053\u2054\u2055\u2056\u2057\u2058\u2059\u205A\u205B\u205C\u205D\u205E\u207D\u207E\u208D\u208E\u2116\u2117\u2120\u2122\u212E\u2212\u2234\u2235\u2248\u2300\u2308\u2309\u230A\u230B\u2311\u2329\u232A\u2380\u25CA\u25CC\u261E\u2640\u2642\u26A5\u2766\u2767\u2768\u2769\u276A\u276B\u276C\u276D\u276E\u276F\u2770\u2771\u2772\u2773\u2774\u2775\u27C5\u27C6\u27E6\u27E7\u27E8\u27E9\u27EA\u27EB\u27EC\u27ED\u27EE\u27EF\u2983\u2984\u2985\u2986\u2987\u2988\u2989\u298A\u298B\u298C\u298D\u298E\u298F\u2990\u2991\u2992\u2993\u2994\u2995\u2996\u2997\u2998\u29D8\u29D9\u29DA\u29DB\u29FC\u29FD\u2CF9\u2CFA\u2CFB\u2CFC\u2CFE\u2CFF\u2D70\u2E00\u2E01\u2E02\u2E03\u2E04\u2E05\u2E06\u2E07\u2E08\u2E09\u2E0A\u2E0B\u2E0C\u2E0D\u2E0E\u2E0F\u2E10\u2E11\u2E12\u2E13\u2E14\u2E15\u2E16\u2E17\u2E18\u2E19\u2E1A\u2E1B\u2E1C\u2E1D\u2E1E\u2E1F\u2E20\u2E21\u2E22\u2E23\u2E24\u2E25\u2E26\u2E27\u2E28\u2E29\u2E2A\u2E2B\u2E2C\u2E2D\u2E2E\u2E30\u2E31\u2E32\u2E33\u2E34\u2E35\u2E36\u2E37\u2E38\u2E39\u2E3A\u2E3B\u2E3C\u2E3D\u2E3E\u2E3F\u2E40\u2E41\u2E42\u2E43\u2E44\u2E45\u2E46\u2E47\u2E48\u2E49\u2E4A\u2E4B\u2E4C\u2E4D\u2E4E\u2E4F\u2E52\u3001\u3002\u3003\u3008\u3009\u300A\u300B\u300C\u300D\u300E\u300F\u3010\u3011\u3014\u3015\u3016\u3017\u3018\u3019\u301A\u301B\u301C\u301D\u301E\u301F\u3030\u303D\u30A0\u30FB\uA4FE\uA4FF\uA60D\uA60E\uA60F\uA673\uA67E\uA6F2\uA6F3\uA6F4\uA6F5\uA6F6\uA6F7\uA874\uA875\uA876\uA877\uA8CE\uA8CF\uA8F8\uA8F9\uA8FA\uA8FC\uA92E\uA92F\uA95F\uA9C1\uA9C2\uA9C3\uA9C4\uA9C5\uA9C6\uA9C7\uA9C8\uA9C9\uA9CA\uA9CB\uA9CC\uA9CD\uA9DE\uA9DF\uAA5C\uAA5D\uAA5E\uAA5F\uAADE\uAADF\uAAF0\uAAF1\uABEB\uD800\uD801\uD802\uD803\uD804\uD805\uD806\uD807\uD809\uD81A\uD81B\uD82F\uD836\uD83A\u{1F03B}\uDC41\uDC42\uDC43\uDC44\uDC45\uDC47\uDC48\uDC49\uDC4A\uDC4B\uDC4C\uDC4D\uDC4E\uDC4F\uDC57\uDC5A\uDC5B\uDC5D\uDC70\uDC71\uDC72\uDC73\uDC74\uDC9F\uDCBB\uDCBC\uDCBE\uDCBF\uDCC0\uDCC1\uDCC6\uDD00\uDD01\uDD02\uDD1F\uDD2F\uDD3F\uDD40\uDD41\uDD42\uDD43\uDD44\uDD45\uDD46\uDD5E\uDD5F\uDD6F\uDD74\uDD75\uDDC1\uDDC2\uDDC3\uDDC4\uDDC5\uDDC6\uDDC7\uDDC8\uDDC9\uDDCA\uDDCB\uDDCC\uDDCD\uDDCE\uDDCF\uDDD0\uDDD1\uDDD2\uDDD3\uDDD4\uDDD5\uDDD6\uDDD7\uDDDB\uDDDD\uDDDE\uDDDF\uDDE2\uDE38\uDE39\uDE3A\uDE3B\uDE3C\uDE3D\uDE3F\uDE40\uDE41\uDE42\uDE43\uDE44\uDE45\uDE46\uDE50\uDE51\uDE52\uDE53\uDE54\uDE55\uDE56\uDE57\uDE58\uDE60\uDE61\uDE62\uDE63\uDE64\uDE65\uDE66\uDE67\uDE68\uDE69\uDE6A\uDE6B\uDE6C\uDE6E\uDE6F\uDE7F\uDE87\uDE88\uDE89\uDE8A\uDE8B\uDE97\uDE98\uDE99\uDE9A\uDE9B\uDE9C\uDE9E\uDE9F\uDEA0\uDEA1\uDEA2\uDEA9\uDEAD\uDEF0\uDEF1\uDEF2\uDEF3\uDEF4\uDEF5\uDEF6\uDEF7\uDEF8\uDF37\uDF38\uDF39\uDF3A\uDF3B\uDF3C\uDF3D\uDF3E\uDF3F\uDF44\uDF55\uDF56\uDF57\uDF58\uDF59\uDF99\uDF9A\uDF9B\uDF9C\uDF9F\uDFD0\uDFE2\uDFFF\uFD3F\uFE10\uFE11\uFE12\uFE13\uFE14\uFE15\uFE16\uFE17\uFE18\uFE19\uFE30\uFE31\uFE32\uFE33\uFE34\uFE35\uFE36\uFE37\uFE38\uFE39\uFE3A\uFE3B\uFE3C\uFE3D\uFE3E\uFE3F\uFE40\uFE41\uFE42\uFE43\uFE44\uFE45\uFE46\uFE47\uFE48\uFE49\uFE4A\uFE4B\uFE4C\uFE4D\uFE4E\uFE4F\uFE50\uFE51\uFE52\uFE54\uFE55\uFE56\uFE57\uFE58\uFE59\uFE5A\uFE5B\uFE5C\uFE5D\uFE5E\uFE5F\uFE60\uFE61\uFE63\uFE68\uFE6A\uFE6B\uFF01\uFF02\uFF03\uFF05\uFF06\uFF07\uFF08\uFF09\uFF0A\uFF0C\uFF0D\uFF0E\uFF0F\uFF1A\uFF1B\uFF1F\uFF20\uFF3B\uFF3C\uFF3D\uFF3F\uFF5B\uFF5D\uFF5F\uFF60\uFF61\uFF62\uFF63\uFF64\uFF65";
+    }
+  });
+
   // node_modules/@jrc03c/js-text-tools/src/helpers/strip.js
   var require_strip = __commonJS({
     "node_modules/@jrc03c/js-text-tools/src/helpers/strip.js"(exports, module) {
       var replaceAll = require_replace_all();
-      var alpha = "abcdefghijklmnopqrstuvwxyz1234567890";
+      var punctuation = require_punctuation();
       var doubleSpace = "  ";
       var singleSpace = " ";
       function strip(text) {
@@ -92,12 +99,10 @@
         let out = "";
         for (let i = 0; i < text.length; i++) {
           const char = text[i].toLowerCase();
-          if (alpha.includes(char)) {
-            out += char;
-          } else if (char === "'" || char === "\u2019" || char === "\u275C") {
-            out += "";
-          } else {
+          if (punctuation.includes(char)) {
             out += singleSpace;
+          } else {
+            out += char;
           }
         }
         while (out.includes(doubleSpace)) {
@@ -150,9 +155,20 @@
   // node_modules/@jrc03c/js-math-tools/src/math-error.js
   var require_math_error = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/math-error.js"(exports, module) {
+      var isBrowser = new Function(`
+  try {
+    return this === window
+  } catch(e) {}
+
+  try {
+    return typeof importScripts !== "undefined"
+  } catch(e) {}
+
+  return false
+`);
       var MathError = class extends Error {
         constructor(message) {
-          if (typeof window !== "undefined") {
+          if (isBrowser()) {
             super(message);
           } else {
             super("\n\n\x1B[31m" + message + "\n\x1B[0m");
@@ -171,20 +187,6 @@
         if (!isTrue)
           throw new MathError(message);
       };
-    }
-  });
-
-  // node_modules/@jrc03c/js-math-tools/src/copy.js
-  var require_copy = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/copy.js"(exports, module) {
-      function copy(x) {
-        try {
-          return structuredClone(x);
-        } catch (e) {
-          return x;
-        }
-      }
-      module.exports = copy;
     }
   });
 
@@ -213,53 +215,6 @@
         }
       }
       module.exports = isDataFrame;
-    }
-  });
-
-  // node_modules/@jrc03c/js-math-tools/src/is-series.js
-  var require_is_series = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/is-series.js"(exports, module) {
-      function isSeries(x) {
-        try {
-          return !!x._symbol && x._symbol === Symbol.for("@jrc03c/js-math-tools/series");
-        } catch (e) {
-          return false;
-        }
-      }
-      module.exports = isSeries;
-    }
-  });
-
-  // node_modules/@jrc03c/js-math-tools/src/flatten.js
-  var require_flatten = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/flatten.js"(exports, module) {
-      var assert = require_assert();
-      var copy = require_copy();
-      var isArray = require_is_array();
-      var isDataFrame = require_is_dataframe();
-      var isSeries = require_is_series();
-      function flatten(arr) {
-        if (isDataFrame(arr) || isSeries(arr)) {
-          return flatten(arr.values);
-        }
-        assert(
-          isArray(arr),
-          "The `flatten` function only works on arrays, Series, and DataFrames!"
-        );
-        function helper(arr2) {
-          let out = [];
-          copy(arr2).forEach((child) => {
-            if (isArray(child)) {
-              out = out.concat(helper(child));
-            } else {
-              out.push(child);
-            }
-          });
-          return out;
-        }
-        return helper(arr);
-      }
-      module.exports = flatten;
     }
   });
 
@@ -302,6 +257,20 @@
         return typeof x === "object" && !isUndefined(x) && !isArray(x);
       }
       module.exports = isObject;
+    }
+  });
+
+  // node_modules/@jrc03c/js-math-tools/src/is-series.js
+  var require_is_series = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/is-series.js"(exports, module) {
+      function isSeries(x) {
+        try {
+          return !!x._symbol && x._symbol === Symbol.for("@jrc03c/js-math-tools/series");
+        } catch (e) {
+          return false;
+        }
+      }
+      module.exports = isSeries;
     }
   });
 
@@ -397,15 +366,47 @@
     }
   });
 
-  // node_modules/@jrc03c/js-math-tools/src/decycle.js
-  var require_decycle = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/decycle.js"(exports, module) {
-      var copy = require_copy();
+  // node_modules/@jrc03c/js-math-tools/src/copy.js
+  var require_copy = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/copy.js"(exports, module) {
       var indexOf = require_index_of();
       var isArray = require_is_array();
       var isDataFrame = require_is_dataframe();
       var isSeries = require_is_series();
-      module.exports = function decycle(x) {
+      function copy(x) {
+        try {
+          const out = structuredClone(x);
+          return out;
+        } catch (e) {
+          if (typeof x === "object") {
+            if (x === null) {
+              return null;
+            }
+            if (isArray(x)) {
+              return x.map((v) => copy(v));
+            }
+            if (isSeries(x)) {
+              const out2 = x.copy();
+              out2.values = copy(out2.values);
+              return out2;
+            }
+            if (isDataFrame(x)) {
+              const out2 = x.copy();
+              out2.values = copy(x.values);
+              return out2;
+            }
+            x = decycle(x);
+            const out = {};
+            Object.keys(x).forEach((key) => {
+              out[key] = copy(x[key]);
+            });
+            return out;
+          } else {
+            return x;
+          }
+        }
+      }
+      function decycle(x) {
         function helper(x2, checked, currentPath) {
           checked = checked || [];
           currentPath = currentPath || "";
@@ -457,15 +458,48 @@
           out = temp;
         }
         return out;
-      };
+      }
+      module.exports = { copy, decycle };
+    }
+  });
+
+  // node_modules/@jrc03c/js-math-tools/src/flatten.js
+  var require_flatten = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/flatten.js"(exports, module) {
+      var { copy } = require_copy();
+      var assert = require_assert();
+      var isArray = require_is_array();
+      var isDataFrame = require_is_dataframe();
+      var isSeries = require_is_series();
+      function flatten(arr) {
+        if (isDataFrame(arr) || isSeries(arr)) {
+          return flatten(arr.values);
+        }
+        assert(
+          isArray(arr),
+          "The `flatten` function only works on arrays, Series, and DataFrames!"
+        );
+        function helper(arr2) {
+          let out = [];
+          copy(arr2).forEach((child) => {
+            if (isArray(child)) {
+              out = out.concat(helper(child));
+            } else {
+              out.push(child);
+            }
+          });
+          return out;
+        }
+        return helper(arr);
+      }
+      module.exports = flatten;
     }
   });
 
   // node_modules/@jrc03c/js-math-tools/src/is-equal.js
   var require_is_equal = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/is-equal.js"(exports, module) {
-      var copy = require_copy();
-      var decycle = require_decycle();
+      var { decycle } = require_copy();
       function isEqual(a, b) {
         function helper(a2, b2) {
           const aType = typeof a2;
@@ -506,7 +540,10 @@
           }
         }
         try {
-          return helper(copy(a), copy(b));
+          if (a instanceof Date && b instanceof Date) {
+            return a.getTime() === b.getTime();
+          }
+          return helper(a, b);
         } catch (e) {
           return helper(decycle(a), decycle(b));
         }
@@ -583,13 +620,13 @@
           "The first argument to the `count` function must be an array, Series, or DataFrame!"
         );
         if (isFunction(matcher)) {
-          return flatten(arr).filter((item) => matcher(item)).length;
+          return flatten(arr).filter((value) => matcher(value)).length;
         } else if (isArray(matcher)) {
           const temp = flatten(arr);
-          return set(matcher).map((item) => {
+          return set(matcher).map((value) => {
             return {
-              item,
-              count: temp.filter((v) => isEqual(v, item)).length
+              value,
+              count: temp.filter((v) => isEqual(v, value)).length
             };
           });
         } else if (arguments.length > 1) {
@@ -1154,7 +1191,7 @@
   // node_modules/@jrc03c/js-math-tools/src/dataframe/df-copy.js
   var require_df_copy = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/dataframe/df-copy.js"(exports, module) {
-      var copy = require_copy();
+      var { copy } = require_copy();
       function dfCopy(DataFrame, df) {
         if (df.isEmpty)
           return new DataFrame();
@@ -1857,7 +1894,7 @@
         }
         const maxRows = typeof window === "undefined" ? 20 : 10;
         const halfMaxRows = parseInt(maxRows / 2);
-        const maxColumns = typeof window === "undefined" ? Math.floor(process.stdout.columns / 24) - 1 : 10;
+        const maxColumns = typeof process === "undefined" ? 10 : Math.floor(process.stdout.columns / 24) - 1;
         const halfMaxColumns = parseInt(maxColumns / 2);
         const tempRows = maxRows > df.index.length ? null : range(0, halfMaxRows).concat(
           range(df.index.length - halfMaxRows, df.index.length)
@@ -2033,8 +2070,8 @@
   // node_modules/@jrc03c/js-math-tools/src/random.js
   var require_random = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/random.js"(exports, module) {
+      var { copy } = require_copy();
       var assert = require_assert();
-      var copy = require_copy();
       var isArray = require_is_array();
       var isNumber = require_is_number();
       var isUndefined = require_is_undefined();
@@ -2531,7 +2568,7 @@
   // node_modules/@jrc03c/js-math-tools/src/series/series-filter.js
   var require_series_filter = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/series/series-filter.js"(exports, module) {
-      var copy = require_copy();
+      var { copy } = require_copy();
       function seriesFilter(Series, series, fn) {
         let out = series.copy();
         const index = copy(out.index);
@@ -2699,7 +2736,7 @@
   // node_modules/@jrc03c/js-math-tools/src/series/series-print.js
   var require_series_print = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/series/series-print.js"(exports, module) {
-      var copy = require_copy();
+      var { copy } = require_copy();
       var range = require_range();
       function seriesPrint(series) {
         let temp = series.copy();
@@ -2820,8 +2857,8 @@
   // node_modules/@jrc03c/js-math-tools/src/series/index.js
   var require_series = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/series/index.js"(exports, module) {
+      var { copy } = require_copy();
       var assert = require_assert();
-      var copy = require_copy();
       var isArray = require_is_array();
       var isString = require_is_string();
       var isUndefined = require_is_undefined();
@@ -3091,8 +3128,8 @@
   // node_modules/@jrc03c/js-math-tools/src/dataframe/index.js
   var require_dataframe = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/dataframe/index.js"(exports, module) {
+      var { copy } = require_copy();
       var assert = require_assert();
-      var copy = require_copy();
       var count = require_count();
       var dfAppend = require_df_append();
       var dfApply = require_df_apply();
@@ -3227,7 +3264,7 @@
                 const temp = count(x);
                 const out = {};
                 temp.forEach((obj) => {
-                  out[obj.item] = obj.count;
+                  out[obj.value] = obj.count;
                 });
                 return out;
               })();
@@ -3278,7 +3315,7 @@
                 const temp = count(x);
                 const out = {};
                 temp.forEach((obj) => {
-                  out[obj.item] = obj.count;
+                  out[obj.value] = obj.count;
                 });
                 return out;
               })();
@@ -3837,6 +3874,149 @@
         }
       }
       module.exports = argmin;
+    }
+  });
+
+  // node_modules/@jrc03c/js-math-tools/src/cast.js
+  var require_cast = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/cast.js"(exports, module) {
+      var isArray = require_is_array();
+      var isBoolean = require_is_boolean();
+      var isDataFrame = require_is_dataframe();
+      var isEqual = require_is_equal();
+      var isNumber = require_is_number();
+      var isObject = require_is_object();
+      var isSeries = require_is_series();
+      var isUndefined = require_is_undefined();
+      function cast(value, type) {
+        if (isDataFrame(value) || isSeries(value)) {
+          return value.apply((item) => cast(item, type));
+        }
+        if (isArray(value)) {
+          return value.map((v) => cast(v, type));
+        }
+        if (type === "null") {
+          return null;
+        }
+        if (type === "number") {
+          if (isUndefined(value)) {
+            return NaN;
+          }
+          const booleanValue = cast(value, "boolean");
+          if (isBoolean(booleanValue)) {
+            return booleanValue ? 1 : 0;
+          }
+          try {
+            JSON.parse(value);
+          } catch (e) {
+            const dateValue = cast(value, "date");
+            if (dateValue instanceof Date) {
+              return dateValue.getTime();
+            }
+          }
+          const out = parseFloat(value);
+          if (isNaN(out))
+            return NaN;
+          return out;
+        }
+        if (type === "boolean") {
+          if (isBoolean(value)) {
+            return value;
+          }
+          if (isNumber(value)) {
+            if (value === 0) {
+              return false;
+            }
+            if (value === 1) {
+              return true;
+            }
+            return null;
+          }
+          try {
+            const vBool = (typeof value === "object" ? value.toString() === "null" ? "false" : JSON.stringify(value) : value.toString()).trim().toLowerCase();
+            if (vBool === "true" || vBool === "yes" || vBool === "y") {
+              return true;
+            }
+            if (vBool === "false" || vBool === "no" || vBool === "n") {
+              return false;
+            }
+            return null;
+          } catch (e) {
+            return null;
+          }
+        }
+        if (type === "date") {
+          if (value instanceof Date) {
+            return value;
+          }
+          if (isUndefined(value)) {
+            return null;
+          }
+          const valueFloat = parseFloat(value);
+          if (!isNaN(valueFloat)) {
+            const out = new Date(value);
+            if (out.toString() === "Invalid Date")
+              return null;
+            return out;
+          }
+          return null;
+        }
+        if (type === "object") {
+          if (isObject(value)) {
+            return value;
+          }
+          const booleanValue = cast(value, "boolean");
+          if (isBoolean(booleanValue)) {
+            return null;
+          }
+          try {
+            const numberValue = cast(value, "number");
+            if (isNumber(numberValue)) {
+              JSON.parse(value);
+              return null;
+            }
+          } catch (e) {
+          }
+          const dateValue = cast(value, "date");
+          if (dateValue) {
+            return dateValue;
+          }
+          try {
+            const out = JSON.parse(value);
+            if (isArray(out)) {
+              return out.map((v) => cast(v, type));
+            } else {
+              return out;
+            }
+          } catch (e) {
+            return null;
+          }
+        }
+        if (type === "string") {
+          if (isUndefined(value)) {
+            if (isEqual(value, void 0)) {
+              return "undefined";
+            }
+            return "null";
+          }
+          if (value instanceof Date) {
+            return value.toJSON();
+          }
+          const valueString = (() => {
+            if (typeof value === "object") {
+              if (value === null) {
+                return "null";
+              } else {
+                return JSON.stringify(value);
+              }
+            } else {
+              return value.toString();
+            }
+          })();
+          return valueString;
+        }
+      }
+      module.exports = cast;
     }
   });
 
@@ -4899,67 +5079,6 @@
     }
   });
 
-  // node_modules/@jrc03c/js-math-tools/src/cast.js
-  var require_cast = __commonJS({
-    "node_modules/@jrc03c/js-math-tools/src/cast.js"(exports, module) {
-      var isArray = require_is_array();
-      var nullValues = require_null_values();
-      function cast(value, type) {
-        if (value === void 0) {
-          value = "undefined";
-        }
-        if (type === "null") {
-          return null;
-        }
-        if (type === "number") {
-          const out = parseFloat(value);
-          if (isNaN(out))
-            return NaN;
-          return out;
-        }
-        if (type === "boolean") {
-          try {
-            const vBool = value.trim().toLowerCase();
-            if (vBool === "true" || vBool === "yes") {
-              return true;
-            }
-            if (vBool === "false" || vBool === "no") {
-              return false;
-            }
-          } catch (e) {
-          }
-          return null;
-        }
-        if (type === "date") {
-          const out = new Date(value);
-          if (out.toString() === "Invalid Date")
-            return null;
-          return out;
-        }
-        if (type === "object") {
-          try {
-            const out = JSON.parse(value);
-            if (isArray(out))
-              return null;
-            return out;
-          } catch (e) {
-            return null;
-          }
-        }
-        if (type === "string") {
-          try {
-            if (nullValues.indexOf(value.trim().toLowerCase()) > -1)
-              return null;
-          } catch (e) {
-            return null;
-          }
-          return value;
-        }
-      }
-      module.exports = cast;
-    }
-  });
-
   // node_modules/@jrc03c/js-math-tools/src/infer-type.js
   var require_infer_type = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/infer-type.js"(exports, module) {
@@ -4988,6 +5107,15 @@
           out.values = results.values;
           return { type: results.type, values: out };
         }
+        if (arr instanceof Date) {
+          return { type: "date", value: arr };
+        }
+        if (!isArray(arr)) {
+          const out = inferType([arr]);
+          out.value = out.values[0];
+          delete out.values;
+          return out;
+        }
         assert(
           isArray(arr),
           "The `inferType` function only works on arrays, Series, and DataFrames!"
@@ -4995,6 +5123,9 @@
         const types = flatten(arr).map((v) => {
           if (v === void 0)
             return "null";
+          if (v instanceof Date) {
+            return "date";
+          }
           if (!isString(v)) {
             v = JSON.stringify(v);
           }
@@ -5026,7 +5157,7 @@
           }
         });
         const counts = count(types).sort((a, b) => b.count - a.count);
-        const primaryType = counts[0].item;
+        const primaryType = counts[0].value;
         return { type: primaryType, values: apply(arr, (v) => cast(v, primaryType)) };
       }
       module.exports = inferType;
@@ -5168,6 +5299,26 @@
     }
   });
 
+  // node_modules/@jrc03c/js-math-tools/src/helpers/is-browser.js
+  var require_is_browser = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/helpers/is-browser.js"(exports, module) {
+      var isBrowser = new Function(
+        `
+    try {
+      return this === window
+    } catch(e) {}
+
+    try {
+      return !!importScripts
+    } catch(e){}
+
+    return false
+  `
+      );
+      module.exports = isBrowser;
+    }
+  });
+
   // node_modules/@jrc03c/js-math-tools/src/lerp.js
   var require_lerp = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/lerp.js"(exports, module) {
@@ -5293,13 +5444,13 @@
             return NaN;
           const counts = {};
           const tempSet = set(temp);
-          tempSet.forEach((item) => {
-            counts[item] = count(temp, item);
+          tempSet.forEach((value) => {
+            counts[value] = count(temp, value);
           });
           const sortedTempSet = sort(tempSet, (a, b) => counts[b] - counts[a]);
-          const mostCountedItem = sortedTempSet[0];
+          const mostCountedValue = sortedTempSet[0];
           const out = sort(
-            sortedTempSet.filter((item) => counts[item] === counts[mostCountedItem])
+            sortedTempSet.filter((value) => counts[value] === counts[mostCountedValue])
           );
           return out;
         } catch (e) {
@@ -5639,6 +5790,7 @@
   // node_modules/@jrc03c/js-math-tools/src/index.js
   var require_src = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/index.js"(exports, module) {
+      var { copy, decycle } = require_copy();
       var { DataFrame, Series } = require_dataframe();
       var out = {
         abs: require_abs(),
@@ -5650,18 +5802,19 @@
         argmax: require_argmax(),
         argmin: require_argmin(),
         assert: require_assert(),
+        cast: require_cast(),
         ceil: require_ceil(),
         chop: require_chop(),
         clamp: require_clamp(),
         combinations: require_combinations(),
-        copy: require_copy(),
+        copy,
         correl: require_correl(),
         cos: require_cos(),
         count: require_count(),
         covariance: require_covariance(),
         DataFrame,
         dataTypes: require_data_types(),
-        decycle: require_decycle(),
+        decycle,
         diff: require_diff(),
         distance: require_distance(),
         divide: require_divide(),
@@ -5686,6 +5839,7 @@
         inverse: require_inverse(),
         isArray: require_is_array(),
         isBoolean: require_is_boolean(),
+        isBrowser: require_is_browser(),
         isDataFrame: require_is_dataframe(),
         isEqual: require_is_equal(),
         isFunction: require_is_function(),
@@ -5776,9 +5930,9 @@
   // node_modules/@jrc03c/js-text-tools/src/stringify.js
   var require_stringify = __commonJS({
     "node_modules/@jrc03c/js-text-tools/src/stringify.js"(exports, module) {
-      var { copy } = require_src();
+      var { decycle } = require_src();
       function stringify(x, replacer, space) {
-        return JSON.stringify(copy(x), replacer, space);
+        return JSON.stringify(decycle(x), replacer, space);
       }
       module.exports = stringify;
     }
@@ -5876,11 +6030,26 @@
     }
   });
 
-  // node_modules/@jrc03c/make-key/index.js
-  var require_make_key = __commonJS({
-    "node_modules/@jrc03c/make-key/index.js"(exports, module) {
-      var { assert, isNumber, int, seed, random } = require_src();
-      function makeKey(keyLength, keySeed) {
+  // node_modules/@jrc03c/make-key/src/index.js
+  var require_src3 = __commonJS({
+    "node_modules/@jrc03c/make-key/src/index.js"(exports, module) {
+      var {
+        assert,
+        int,
+        isNumber,
+        isString,
+        random,
+        seed
+      } = require_src();
+      function makeKey(keyLength, keySeed, charset) {
+        if (arguments.length === 2) {
+          if (isNumber(arguments[1])) {
+            charset = null;
+          } else {
+            charset = keySeed;
+            keySeed = null;
+          }
+        }
         assert(
           isNumber(keyLength) && int(keyLength) === keyLength,
           "`keyLength` must be an integer!"
@@ -5892,24 +6061,30 @@
           );
           seed(keySeed);
         }
+        if (charset) {
+          assert(isString(charset), "`charset` must be a string!");
+        }
         let out = "";
-        let alpha = "abcdefghijklmnopqrstuvwxyz1234567890";
+        charset = charset || "abcdefg1234567890";
         for (let i = 0; i < keyLength; i++) {
-          out += alpha[int(random() * alpha.length)];
+          out += charset[int(random() * charset.length)];
         }
         return out;
       }
       if (typeof module !== "undefined") {
         module.exports = makeKey;
       }
+      if (typeof window !== "undefined") {
+        window.makeKey = makeKey;
+      }
     }
   });
 
   // src/index.js
-  var require_src3 = __commonJS({
+  var require_src4 = __commonJS({
     "src/index.js"(exports, module) {
       var { stringify } = require_src2();
-      var makeKey = require_make_key();
+      var makeKey = require_src3();
       var SubscriptionService = class {
         constructor() {
           const self = this;
@@ -6072,5 +6247,5 @@
       }
     }
   });
-  require_src3();
+  require_src4();
 })();
