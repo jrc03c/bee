@@ -3959,6 +3959,10 @@
               return null;
             return out;
           }
+          const valueDate = Date.parse(value);
+          if (!isNaN(valueDate)) {
+            return new Date(valueDate);
+          }
           return null;
         }
         if (type === "object") {
@@ -5107,9 +5111,6 @@
           out.values = results.values;
           return { type: results.type, values: out };
         }
-        if (arr instanceof Date) {
-          return { type: "date", value: arr };
-        }
         if (!isArray(arr)) {
           const out = inferType([arr]);
           out.value = out.values[0];
@@ -5123,8 +5124,14 @@
         const types = flatten(arr).map((v) => {
           if (v === void 0)
             return "null";
-          if (v instanceof Date) {
-            return "date";
+          try {
+            if (typeof v === "object") {
+              const temp = new Date(v.toString());
+              if (temp instanceof Date && temp.toString() !== "Invalid Date") {
+                return "date";
+              }
+            }
+          } catch (e) {
           }
           if (!isString(v)) {
             v = JSON.stringify(v);
