@@ -17,6 +17,10 @@
 
       const queen = new Bee.Queen()
 
+      queen.on("the-drone-says-hi", () => {
+        console.log("The drone says hi!")
+      })
+
       queen.addDrone("./worker.js")
       queen.command("dubble", 234).then(console.log)
 
