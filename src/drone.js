@@ -1,8 +1,6 @@
 const SubscriptionService = require("./subscription-service")
 
 class Drone extends SubscriptionService {
-  _worker = undefined
-
   constructor(path) {
     super()
 
@@ -17,8 +15,7 @@ class Drone extends SubscriptionService {
     }
 
     if (path) {
-      this._worker = new Worker(path)
-      this.context = this._worker
+      this.context = new Worker(path)
     }
   }
 
@@ -31,9 +28,8 @@ class Drone extends SubscriptionService {
   }
 
   destroy() {
-    if (this._worker) {
-      this._worker.terminate()
-      delete this._worker
+    if (this.context instanceof Worker) {
+      this.context.terminate()
     }
 
     return super.destroy()

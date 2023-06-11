@@ -6278,7 +6278,6 @@
     "src/drone.js"(exports, module) {
       var SubscriptionService = require_subscription_service();
       var Drone = class extends SubscriptionService {
-        _worker = void 0;
         constructor(path) {
           super();
           if (typeof window === "undefined") {
@@ -6291,8 +6290,7 @@
             throw new Error("You must pass a `path` into the `Drone` constructor!");
           }
           if (path) {
-            this._worker = new Worker(path);
-            this.context = this._worker;
+            this.context = new Worker(path);
           }
         }
         get isDead() {
@@ -6302,9 +6300,8 @@
           return this.emit(signal, payload);
         }
         destroy() {
-          if (this._worker) {
-            this._worker.terminate();
-            delete this._worker;
+          if (this.context instanceof Worker) {
+            this.context.terminate();
           }
           return super.destroy();
         }

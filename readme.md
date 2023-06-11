@@ -175,13 +175,9 @@ Same as `drone.emit(signal, payload)`.
 
 ### Properties
 
-#### `drone._worker`
-
-Refers to the corresponding web worker in the window context, but is undefined in the worker context.
-
 #### `drone.context`
 
-Refers to `drone._worker` in the window context or `globalThis` in the worker context.
+Refers to the corresponding web worker in the window context or `globalThis` in the worker context.
 
 #### `drone.hasBeenDestroyed`
 
