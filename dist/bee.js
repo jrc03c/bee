@@ -6351,10 +6351,12 @@
         }
         on(path, callback) {
           this.hive.forEach((drone) => {
-            drone.on(path, async (request, response) => {
-              const innerResponse = { send: response.send };
-              callback(request, innerResponse);
-            });
+            drone.on(path, callback);
+          });
+        }
+        off(path, callback) {
+          this.hive.forEach((drone) => {
+            drone.off(path, callback);
           });
         }
         emit(path, payload) {
