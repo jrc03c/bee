@@ -181,7 +181,11 @@ Refers to the corresponding web worker in the window context or `globalThis` in 
 
 #### `drone.hasBeenDestroyed`
 
-A boolean indicating whether or not the drone has been destroyed.
+A read-only boolean indicating whether or not the drone has been destroyed.
+
+#### `drone.isDead`
+
+Same as `drone.hasBeenDestroyed` but defined so that the drone metaphor can be carried a little further.
 
 #### `drone.rejects`
 

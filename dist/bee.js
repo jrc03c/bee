@@ -6153,13 +6153,16 @@
         return JSON.parse(x);
       }
       var SubscriptionService = class {
+        #_hasBeenDestroyed = false;
         context = void 0;
-        hasBeenDestroyed = false;
         rejects = [];
         resolves = [];
         unsubs = [];
         constructor() {
           this.context = globalThis;
+        }
+        get hasBeenDestroyed() {
+          return this.#_hasBeenDestroyed;
         }
         on(signal, callback) {
           if (this.hasBeenDestroyed) {
@@ -6245,18 +6248,7 @@
               "This SubscriptionService instance has already been destroyed!"
             );
           }
-          Object.defineProperty(this, "hasBeenDestroyed", {
-            configurable: false,
-            enumerable: true,
-            get() {
-              return true;
-            },
-            set() {
-              throw new Error(
-                "This SubscriptionService instance has already been destroyed!"
-              );
-            }
-          });
+          this.#_hasBeenDestroyed = true;
           this.unsubs.forEach((unsub) => unsub());
           if (error) {
             this.rejects.forEach((reject) => reject(error));

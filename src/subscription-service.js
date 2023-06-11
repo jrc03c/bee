@@ -43,14 +43,18 @@ function betterParse(x) {
 }
 
 class SubscriptionService {
+  #_hasBeenDestroyed = false
   context = undefined
-  hasBeenDestroyed = false
   rejects = []
   resolves = []
   unsubs = []
 
   constructor() {
     this.context = globalThis
+  }
+
+  get hasBeenDestroyed() {
+    return this.#_hasBeenDestroyed
   }
 
   on(signal, callback) {
@@ -151,21 +155,7 @@ class SubscriptionService {
       )
     }
 
-    Object.defineProperty(this, "hasBeenDestroyed", {
-      configurable: false,
-      enumerable: true,
-
-      get() {
-        return true
-      },
-
-      set() {
-        throw new Error(
-          "This SubscriptionService instance has already been destroyed!"
-        )
-      },
-    })
-
+    this.#_hasBeenDestroyed = true
     this.unsubs.forEach(unsub => unsub())
 
     if (error) {
