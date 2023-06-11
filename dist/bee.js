@@ -6239,9 +6239,6 @@
             }
           });
         }
-        trigger(signal, payload) {
-          return this.emit(signal, payload);
-        }
         destroy(error) {
           if (this.hasBeenDestroyed) {
             throw new Error(
@@ -6284,6 +6281,15 @@
         _worker = void 0;
         constructor(path) {
           super();
+          if (typeof window === "undefined") {
+            if (typeof path !== "undefined") {
+              throw new Error(
+                "You must not pass a `path` to a `Drone` created in a web worker context! (Passing a `path` only makes sense when creating a `Drone` in a window context.)"
+              );
+            }
+          } else if (typeof path === "undefined") {
+            throw new Error("You must pass a `path` into the `Drone` constructor!");
+          }
           if (path) {
             this._worker = new Worker(path);
             this.context = this._worker;

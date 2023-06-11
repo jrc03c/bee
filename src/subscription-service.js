@@ -144,10 +144,6 @@ class SubscriptionService {
     })
   }
 
-  trigger(signal, payload) {
-    return this.emit(signal, payload)
-  }
-
   destroy(error) {
     if (this.hasBeenDestroyed) {
       throw new Error(
