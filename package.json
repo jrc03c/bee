@@ -15,12 +15,13 @@
   },
   "dependencies": {
     "@jrc03c/js-math-tools": "github:jrc03c/js-math-tools",
-    "@jrc03c/js-text-tools": "github:jrc03c/js-text-tools",
+    "@jrc03c/js-text-tools": "^0.0.11",
     "@jrc03c/make-key": "github:jrc03c/make-key"
   },
   "devDependencies": {
     "@jrc03c/watch": "github:jrc03c/watch",
     "esbuild": "^0.14.51",
-    "eslint": "^8.21.0"
+    "eslint": "^8.21.0",
+    "prettier": "^2.8.8"
   }
 }

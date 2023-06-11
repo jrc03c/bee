@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: monospace;
+        font-size: 1.5em;
+        padding: 3em;
+      }
+
+      .result {
+        text-indent: -3em;
+        padding-left: 3em;
+      }
+
+      .running {
+        color: rgb(192, 192, 192);
+      }
+
+      .running::before {
+        content: "⏲️";
+        font-weight: bold;
+        margin-right: 0.5em;
+      }
+
+      .success {
+        color: rgb(0, 192, 0);
+      }
+
+      .success::before {
+        content: "🟢";
+        font-weight: bold;
+        margin-right: 0.5em;
+      }
+
+      .error {
+        color: rgb(192, 0, 0);
+      }
+
+      .error::before {
+        content: "🔴";
+        font-weight: bold;
+        margin-right: 0.5em;
+      }
+
+      .reason {
+        margin-left: 0.5em;
+        color: rgba(192, 0, 0, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Tests</h1>
+    <div id="container"></div>
+    <script src="bee.js"></script>
+    <script src="fake-jest.js"></script>
+    <script src="../node_modules/@jrc03c/js-math-tools/dist/js-math-tools.js"></script>
+    <script>
+      const { decycle } = JSMathTools
+
+      function pause(ms) {
+        return new Promise((resolve, reject) => {
+          try {
+            return setTimeout(() => resolve(), ms)
+          } catch (e) {
+            return reject(e)
+          }
+        })
+      }
+
+      function postMessageAsync(drone, path, payload, ms) {
+        return new Promise((resolve, reject) => {
+          try {
+            pause(ms).then(() => reject("Timed out!"))
+            drone.emit(path, payload).then(resolve)
+          } catch (e) {
+            return reject(e)
+          }
+        })
+      }
+
+      async function runTests() {
+        await test("that queens can only send commands when they have drones and are alive", async () => {
+          const queen = new Bee.Queen()
+
+          await expect(async () => {
+            queen.command("do-something")
+          }).toThrowAsync()
+
+          queen.addDrone("worker.js")
+          const result = await queen.command("double", 234)
+          expect(result).toBe(468)
+
+          queen.destroy()
+
+          await expect(async () => {
+            await queen.command("double", 345)
+          }).toThrowAsync()
+        })
+
+        await test("that queens shut everything down immediately when destroyed", async () => {
+          const queen = new Bee.Queen("worker.js")
+          const drone = queen.hive[0]
+          const start = new Date()
+          const duration = 500
+          setTimeout(() => queen.destroy(), 100)
+          await queen.command("wait", duration)
+          const stop = new Date()
+          expect(stop - start).toBeLessThan(duration)
+
+          await expect(async () => {
+            await postMessageAsync(drone, "double", 234, 1000)
+          }).toThrowAsync()
+        })
+
+        await test("that drones shut down immediately when destroyed", async () => {
+          const drone = new Bee.Drone("worker.js")
+
+          await (() => {
+            return new Promise(async (resolve, reject) => {
+              try {
+                let elapsedTime = 0
+
+                const callback = event => {
+                  if (event.data.path === "pulse-elapsed-time") {
+                    elapsedTime = event.data.payload
+                  }
+                }
+
+                globalThis.addEventListener("message", callback)
+                drone.emit("pulse")
+
+                await pause(250)
+                drone.destroy()
+                expect(elapsedTime).toBeLessThan(300)
+
+                const finalElapsedTime = elapsedTime
+
+                await pause(250)
+                expect(elapsedTime).toBe(finalElapsedTime)
+                globalThis.removeEventListener("message", callback)
+                resolve()
+              } catch (e) {
+                return reject(e)
+              }
+            })
+          })()
+        })
+
+        await test("that all data types can be transmitted back and forth correctly", async () => {
+          const queen = new Bee.Queen("worker.js")
+          const selfReferencer = [2, 3, 4]
+          selfReferencer.push(selfReferencer)
+
+          const variables = [
+            0,
+            1,
+            2.3,
+            -2.3,
+            Infinity,
+            -Infinity,
+            NaN,
+            "foo",
+            true,
+            false,
+            null,
+            undefined,
+            Symbol.for("Hello, world!"),
+            [2, 3, 4],
+            [
+              [2, 3, 4],
+              [5, 6, 7],
+            ],
+            { hello: "world" },
+            selfReferencer,
+          ]
+
+          for (const vTrue of variables) {
+            const vPred = await queen.command("send-it-right-back", vTrue)
+            expect(vPred).toBe(decycle(vTrue))
+          }
+
+          class Person {
+            constructor(name, age) {
+              this.name = name
+              this.age = age
+            }
+          }
+
+          const alice = new Person("Alice", 23)
+          const aliceTrue = { name: alice.name, age: alice.age }
+          const alicePred = await queen.command("send-it-right-back", alice)
+          expect(alicePred).toBe(aliceTrue)
+
+          queen.destroy()
+        })
+
+        await test("that queens can have multiple drones in their hives", async () => {
+          const queen = new Bee.Queen("worker.js", 5)
+          const x = 234
+          const yTrue = queen.hive.map(() => x * 2)
+          const yPred = await queen.command("double", x)
+          expect(yPred).toBe(yTrue)
+          queen.destroy()
+        })
+
+        await test("that drones in the same hive don't share the same context (worker-side)", async () => {
+          const queen = new Bee.Queen("worker.js", 5)
+          await queen.command("set-random-number")
+          const numbers = await queen.command("get-random-number")
+
+          numbers.forEach((v1, i) => {
+            numbers.forEach((v2, j) => {
+              if (i !== j) {
+                expect(v1 !== v2).toBe(true)
+              }
+            })
+          })
+
+          queen.destroy()
+        })
+
+        await test("that drones can do their own work without a queen", async () => {
+          const drone = new Bee.Drone("worker.js")
+          expect(await drone.emit("double", 12345)).toBe(24690)
+          drone.destroy()
+        })
+
+        await test("that workers can initiate messages", async () => {
+          // with a drone listener
+          await (() => {
+            return new Promise((resolve, reject) => {
+              try {
+                const drone = new Bee.Drone("worker.js")
+
+                drone.on("message-initiated-by-worker", (request, response) => {
+                  expect(request.data).toBe("The worker says hi!")
+                  drone.destroy()
+                  resolve()
+                })
+              } catch (e) {
+                return reject(e)
+              }
+            })
+          })()
+
+          // with a queen listener
+          await (() => {
+            return new Promise((resolve, reject) => {
+              try {
+                const queen = new Bee.Queen("worker.js")
+
+                queen.on("message-initiated-by-worker", (request, response) => {
+                  expect(request.data).toBe("The worker says hi!")
+                  queen.destroy()
+                  resolve()
+                })
+              } catch (e) {
+                return reject(e)
+              }
+            })
+          })()
+        })
+      }
+
+      runTests()
+    </script>
+  </body>
+</html>

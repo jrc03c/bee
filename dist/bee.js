@@ -6102,165 +6102,339 @@
     }
   });
 
-  // src/index.js
-  var require_src4 = __commonJS({
-    "src/index.js"(exports, module) {
+  // src/array-prototype-remove.js
+  var require_array_prototype_remove = __commonJS({
+    "src/array-prototype-remove.js"() {
+      Array.prototype.remove = function(x) {
+        let index = this.indexOf(x);
+        while (index > -1) {
+          this.splice(index, 1);
+          index = this.indexOf(x);
+        }
+        return this;
+      };
+    }
+  });
+
+  // src/subscription-service.js
+  var require_subscription_service = __commonJS({
+    "src/subscription-service.js"(exports, module) {
       var { stringify } = require_src2();
       var makeKey = require_src3();
+      require_array_prototype_remove();
+      function betterStringify(x) {
+        if (x === Infinity) {
+          return "Infinity";
+        }
+        if (x === -Infinity) {
+          return "-Infinity";
+        }
+        if (typeof x === "number" && isNaN(x)) {
+          return "NaN";
+        }
+        if (typeof x === "symbol") {
+          return x.toString();
+        }
+        return stringify(x);
+      }
+      function betterParse(x) {
+        if (x === "Infinity") {
+          return Infinity;
+        }
+        if (x === "-Infinity") {
+          return -Infinity;
+        }
+        if (x === "NaN") {
+          return NaN;
+        }
+        if (x.match(/^Symbol\(.*?\)$/g)) {
+          return Symbol.for(x.replace("Symbol(", "").slice(0, -1));
+        }
+        return JSON.parse(x);
+      }
       var SubscriptionService = class {
+        context = void 0;
+        hasBeenDestroyed = false;
+        rejects = [];
+        resolves = [];
+        unsubs = [];
         constructor() {
-          const self = this;
-          self.subscriptions = {};
+          this.context = globalThis;
         }
         on(path, callback) {
-          const self = this;
-          if (!self.subscriptions[path])
-            self.subscriptions[path] = [];
-          self.subscriptions[path].push(callback);
-          return self;
-        }
-        off(path, callback) {
-          const self = this;
-          self.subscriptions[path].splice(
-            self.subscriptions[path].indexOf(callback),
-            1
-          );
-          return self;
-        }
-        run(path, payload) {
-          const self = this;
-          const callbacks = self.subscriptions[path];
-          if (callbacks)
-            callbacks.forEach((cb) => cb(payload));
-          return self;
-        }
-      };
-      var Drone = class extends SubscriptionService {
-        constructor() {
-          super();
-          const self = this;
-          onmessage = (event) => self.run(event.data.path, event.data.payload, event.data.cbid);
-        }
-        run(path, payload, cbid) {
-          const self = this;
-          const request = {
-            data: payload
-          };
-          const response = {
-            send: function(result) {
+          if (this.hasBeenDestroyed) {
+            throw new Error(
+              "This SubscriptionService instance has already been destroyed!"
+            );
+          }
+          const inner = (event) => {
+            if (event.data.path === path) {
+              const cbid = event.data.cbid;
+              let payload = event.data.payload;
               try {
-                result = JSON.parse(stringify(result));
+                payload = betterParse(payload);
               } catch (e) {
               }
-              postMessage({
-                path: cbid,
-                payload: result
-              });
+              const request = { data: payload };
+              const response = {
+                send: (result) => {
+                  try {
+                    result = betterStringify(result);
+                  } catch (e) {
+                  }
+                  if (!this.hasBeenDestroyed) {
+                    this.context.postMessage({
+                      path: cbid,
+                      payload: result
+                    });
+                  }
+                }
+              };
+              callback(request, response);
             }
           };
-          const callbacks = self.subscriptions[path];
-          if (callbacks)
-            callbacks.forEach((cb) => cb(request, response));
-          else
-            response.send(null);
-          return self;
+          this.context.addEventListener("message", inner);
+          const unsub = () => this.context.removeEventListener("message", inner);
+          this.unsubs.push(unsub);
+          return unsub;
         }
-      };
-      var Queen = class extends SubscriptionService {
-        constructor(filename, n) {
-          super();
-          const self = this;
-          self.hive = [];
-          if (filename) {
-            self.addDrones(filename, n || 1);
-          }
-        }
-        addDrone(filename) {
-          const self = this;
-          const drone = new Worker(filename);
-          drone.onmessage = (event) => super.run(event.data.path, event.data.payload);
-          self.hive.push(drone);
-          return drone;
-        }
-        addDrones(filename, n) {
-          const self = this;
-          for (let i = 0; i < n; i++)
-            self.addDrone(filename);
-          return self;
-        }
-        removeDrone(drone) {
-          const self = this;
-          self.hive = self.hive.filter((other) => other !== drone);
-          drone.terminate();
-          return self;
-        }
-        removeDrones(drones) {
-          const self = this;
-          drones.forEach((drone) => self.removeDrone(drone));
-          return self;
-        }
-        run(path, payload) {
-          const self = this;
-          if (self.hive.length === 0) {
-            console.warn(
-              "The queen issued a command, but there are no drones in the hive! Use the queen's `addDrone` method to add a drone to the hive! (https://github.com/jrc03c/bee.js)"
+        emit(path, payload) {
+          if (this.hasBeenDestroyed) {
+            throw new Error(
+              "This SubscriptionService instance has already been destroyed!"
             );
-            return null;
           }
           return new Promise((resolve, reject) => {
             try {
+              const cbid = makeKey(8);
+              const callback = (event) => {
+                if (event.data.path === cbid) {
+                  this.context.removeEventListener("message", callback);
+                  this.resolves.remove(resolve);
+                  this.rejects.remove(reject);
+                  let out = event.data.payload;
+                  try {
+                    out = betterParse(out);
+                  } catch (e) {
+                  }
+                  return resolve(out);
+                }
+              };
+              this.context.addEventListener("message", callback);
+              this.resolves.push(resolve);
+              this.rejects.push(reject);
               try {
-                payload = JSON.parse(stringify(payload));
+                payload = betterStringify(payload);
               } catch (e) {
               }
-              const results = new Array(self.hive.length);
-              const promises = self.hive.map(function(drone, i) {
-                return new Promise(function(innerResolve, innerReject) {
+              this.context.postMessage({
+                cbid,
+                path,
+                payload
+              });
+            } catch (e) {
+              this.resolves.remove(resolve);
+              this.rejects.remove(reject);
+              return reject(e);
+            }
+          });
+        }
+        trigger(path, payload) {
+          return this.emit(path, payload);
+        }
+        destroy(error) {
+          if (this.hasBeenDestroyed) {
+            throw new Error(
+              "This SubscriptionService instance has already been destroyed!"
+            );
+          }
+          Object.defineProperty(this, "hasBeenDestroyed", {
+            configurable: false,
+            enumerable: true,
+            get() {
+              return true;
+            },
+            set() {
+              throw new Error(
+                "This SubscriptionService instance has already been destroyed!"
+              );
+            }
+          });
+          this.unsubs.forEach((unsub) => unsub());
+          if (error) {
+            this.rejects.forEach((reject) => reject(error));
+          } else {
+            this.resolves.forEach((resolve) => resolve());
+          }
+          delete this.context;
+          delete this.rejects;
+          delete this.resolves;
+          delete this.unsubs;
+        }
+      };
+      module.exports = SubscriptionService;
+    }
+  });
+
+  // src/drone.js
+  var require_drone = __commonJS({
+    "src/drone.js"(exports, module) {
+      var SubscriptionService = require_subscription_service();
+      var Drone = class extends SubscriptionService {
+        _worker = void 0;
+        constructor(filename) {
+          super();
+          if (filename) {
+            this._worker = new Worker(filename);
+            this.context = this._worker;
+          }
+        }
+        get isDead() {
+          return this.hasBeenDestroyed;
+        }
+        propose(path, payload) {
+          return this.emit(path, payload);
+        }
+        destroy() {
+          if (this._worker) {
+            this._worker.terminate();
+            delete this._worker;
+          }
+          return super.destroy();
+        }
+      };
+      module.exports = Drone;
+    }
+  });
+
+  // src/queen.js
+  var require_queen = __commonJS({
+    "src/queen.js"(exports, module) {
+      var Drone = require_drone();
+      var SubscriptionService = require_subscription_service();
+      var Queen = class extends SubscriptionService {
+        hive = [];
+        constructor(filename, n) {
+          super();
+          if (filename) {
+            n = n || 1;
+            this.addDrones(filename, n);
+          }
+        }
+        get isDead() {
+          return this.hasBeenDestroyed;
+        }
+        addDrone(filename) {
+          if (this.isDead) {
+            throw new Error("The queen is dead!");
+          }
+          this.hive.push(new Drone(filename));
+          return this;
+        }
+        addDrones(filename, n) {
+          for (let i = 0; i < n; i++) {
+            this.addDrone(filename);
+          }
+          return this;
+        }
+        removeDrone(drone) {
+          if (this.isDead) {
+            throw new Error("The queen is dead!");
+          }
+          drone.destroy();
+          this.hive.remove(drone);
+          return this;
+        }
+        removeDrones(drones) {
+          drones.forEach((drone) => this.removeDrone(drone));
+          return this;
+        }
+        on(path, callback) {
+          this.hive.forEach((drone) => {
+            drone.on(path, async (request, response) => {
+              const innerResponse = { send: response.send };
+              callback(request, innerResponse);
+            });
+          });
+        }
+        emit(path, payload) {
+          if (this.isDead) {
+            throw new Error("The queen is dead!");
+          }
+          if (this.hive.length === 0) {
+            throw new Error(
+              `The queen issued a "${path}" command, but there are no drones in the hive!`
+            );
+          }
+          return new Promise((resolve, reject) => {
+            try {
+              const results = new Array(this.hive.length);
+              const promises = this.hive.map((drone, i) => {
+                return new Promise((resolve2, reject2) => {
                   try {
-                    const cbid = makeKey(32);
-                    self.on(cbid, (result) => {
-                      self.off(cbid, this);
-                      results[i] = result;
-                      innerResolve();
+                    this.resolves.push(resolve2);
+                    this.rejects.push(reject2);
+                    drone.emit(path, payload).then((result) => {
+                      if (!this.hasBeenDestroyed) {
+                        this.resolves.remove(resolve2);
+                        this.rejects.remove(reject2);
+                        results[i] = result;
+                        resolve2();
+                      }
                     });
-                    drone.postMessage({ path, payload, cbid });
                   } catch (e) {
-                    innerReject(e);
+                    this.resolves.remove(resolve2);
+                    this.rejects.remove(reject2);
+                    return reject2(e);
                   }
                 });
               });
+              this.resolves.push(resolve);
+              this.rejects.push(reject);
               Promise.all(promises).then(() => {
-                if (self.hive.length === 1)
-                  resolve(results[0]);
-                else
-                  resolve(results);
+                if (!this.hasBeenDestroyed) {
+                  this.resolves.remove(resolve);
+                  this.rejects.remove(reject);
+                  if (results.length === 1) {
+                    return resolve(results[0]);
+                  } else {
+                    return resolve(results);
+                  }
+                }
               });
             } catch (e) {
-              reject(e);
+              this.resolves.remove(resolve);
+              this.rejects.remove(reject);
+              return reject(e);
             }
           });
         }
         command(path, payload) {
-          const self = this;
-          return self.run(path, payload);
+          return this.emit(path, payload);
         }
-        kill() {
-          const self = this;
-          self.stop();
-          self.removeDrones(self.hive);
-          return null;
-        }
-        stop() {
-          const self = this;
-          self.hive.forEach((drone) => drone.terminate());
-          return self;
-        }
-        terminate() {
-          const self = this;
-          return self.stop();
+        destroy(error) {
+          if (this.isDead) {
+            throw new Error("The queen is dead!");
+          }
+          const out = super.destroy(error);
+          this.hive.forEach((drone) => {
+            drone.destroy(error);
+          });
+          delete this.hive;
+          return out;
         }
       };
-      var Bee = { Drone, Queen };
+      module.exports = Queen;
+    }
+  });
+
+  // src/index.js
+  var require_src4 = __commonJS({
+    "src/index.js"(exports, module) {
+      var Bee = {
+        Drone: require_drone(),
+        Queen: require_queen()
+      };
       if (typeof module !== "undefined") {
         module.exports = Bee;
       }

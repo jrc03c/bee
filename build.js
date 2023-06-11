@@ -9,7 +9,7 @@ function rebuild() {
   const commands = [
     `npx esbuild src/index.js --bundle --outfile=dist/bee.min.js --minify`,
     `npx esbuild src/index.js --bundle --outfile=dist/bee.js`,
-    `npx esbuild src/index.js --bundle --outfile=demo/bee.js`,
+    `npx esbuild src/index.js --bundle --outfile=tests/bee.js`,
   ]
 
   commands.forEach(command => {
