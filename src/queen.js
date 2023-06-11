@@ -4,12 +4,12 @@ const SubscriptionService = require("./subscription-service")
 class Queen extends SubscriptionService {
   hive = []
 
-  constructor(filename, n) {
+  constructor(path, n) {
     super()
 
-    if (filename) {
+    if (path) {
       n = n || 1
-      this.addDrones(filename, n)
+      this.addDrones(path, n)
     }
   }
 
@@ -17,18 +17,18 @@ class Queen extends SubscriptionService {
     return this.hasBeenDestroyed
   }
 
-  addDrone(filename) {
+  addDrone(path) {
     if (this.isDead) {
       throw new Error("The queen is dead!")
     }
 
-    this.hive.push(new Drone(filename))
+    this.hive.push(new Drone(path))
     return this
   }
 
-  addDrones(filename, n) {
+  addDrones(path, n) {
     for (let i = 0; i < n; i++) {
-      this.addDrone(filename)
+      this.addDrone(path)
     }
 
     return this
@@ -49,26 +49,24 @@ class Queen extends SubscriptionService {
     return this
   }
 
-  on(path, callback) {
-    this.hive.forEach(drone => {
-      drone.on(path, callback)
+  on(signal, callback) {
+    const unsubs = this.hive.map(drone => {
+      return drone.on(signal, callback)
     })
+
+    const unsub = () => unsubs.forEach(unsub => unsub())
+    this.unsubs.push(unsub)
+    return unsub
   }
 
-  off(path, callback) {
-    this.hive.forEach(drone => {
-      drone.off(path, callback)
-    })
-  }
-
-  emit(path, payload) {
+  emit(signal, payload) {
     if (this.isDead) {
       throw new Error("The queen is dead!")
     }
 
     if (this.hive.length === 0) {
       throw new Error(
-        `The queen issued a "${path}" command, but there are no drones in the hive!`
+        `The queen issued a "${signal}" command, but there are no drones in the hive!`
       )
     }
 
@@ -82,7 +80,7 @@ class Queen extends SubscriptionService {
               this.resolves.push(resolve)
               this.rejects.push(reject)
 
-              drone.emit(path, payload).then(result => {
+              drone.emit(signal, payload).then(result => {
                 if (!this.hasBeenDestroyed) {
                   this.resolves.remove(resolve)
                   this.rejects.remove(reject)
@@ -121,8 +119,8 @@ class Queen extends SubscriptionService {
     })
   }
 
-  command(path, payload) {
-    return this.emit(path, payload)
+  command(signal, payload) {
+    return this.emit(signal, payload)
   }
 
   destroy(error) {

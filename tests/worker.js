@@ -19,7 +19,7 @@ drone.on("pulse", (request, response) => {
 
   setInterval(() => {
     globalThis.postMessage({
-      path: "pulse-elapsed-time",
+      signal: "pulse-elapsed-time",
       payload: new Date() - start,
     })
   }, 10)
@@ -34,6 +34,11 @@ drone.on("set-random-number", (request, response) => {
 
 drone.on("get-random-number", (request, response) => {
   return response.send(globalThis.randomNumber)
+})
+
+drone.on("call-me-back", async (request, response) => {
+  await drone.emit("called-you-back", 234)
+  return response.send()
 })
 
 setTimeout(() => {

@@ -6161,14 +6161,14 @@
         constructor() {
           this.context = globalThis;
         }
-        on(path, callback) {
+        on(signal, callback) {
           if (this.hasBeenDestroyed) {
             throw new Error(
               "This SubscriptionService instance has already been destroyed!"
             );
           }
           const inner = (event) => {
-            if (event.data.path === path) {
+            if (event.data.signal === signal) {
               const cbid = event.data.cbid;
               let payload = event.data.payload;
               try {
@@ -6184,7 +6184,7 @@
                   }
                   if (!this.hasBeenDestroyed) {
                     this.context.postMessage({
-                      path: cbid,
+                      signal: cbid,
                       payload: result
                     });
                   }
@@ -6198,7 +6198,7 @@
           this.unsubs.push(unsub);
           return unsub;
         }
-        emit(path, payload) {
+        emit(signal, payload) {
           if (this.hasBeenDestroyed) {
             throw new Error(
               "This SubscriptionService instance has already been destroyed!"
@@ -6208,7 +6208,7 @@
             try {
               const cbid = makeKey(8);
               const callback = (event) => {
-                if (event.data.path === cbid) {
+                if (event.data.signal === cbid) {
                   this.context.removeEventListener("message", callback);
                   this.resolves.remove(resolve);
                   this.rejects.remove(reject);
@@ -6229,7 +6229,7 @@
               }
               this.context.postMessage({
                 cbid,
-                path,
+                signal,
                 payload
               });
             } catch (e) {
@@ -6239,8 +6239,8 @@
             }
           });
         }
-        trigger(path, payload) {
-          return this.emit(path, payload);
+        trigger(signal, payload) {
+          return this.emit(signal, payload);
         }
         destroy(error) {
           if (this.hasBeenDestroyed) {
@@ -6282,18 +6282,18 @@
       var SubscriptionService = require_subscription_service();
       var Drone = class extends SubscriptionService {
         _worker = void 0;
-        constructor(filename) {
+        constructor(path) {
           super();
-          if (filename) {
-            this._worker = new Worker(filename);
+          if (path) {
+            this._worker = new Worker(path);
             this.context = this._worker;
           }
         }
         get isDead() {
           return this.hasBeenDestroyed;
         }
-        propose(path, payload) {
-          return this.emit(path, payload);
+        propose(signal, payload) {
+          return this.emit(signal, payload);
         }
         destroy() {
           if (this._worker) {
@@ -6314,26 +6314,26 @@
       var SubscriptionService = require_subscription_service();
       var Queen = class extends SubscriptionService {
         hive = [];
-        constructor(filename, n) {
+        constructor(path, n) {
           super();
-          if (filename) {
+          if (path) {
             n = n || 1;
-            this.addDrones(filename, n);
+            this.addDrones(path, n);
           }
         }
         get isDead() {
           return this.hasBeenDestroyed;
         }
-        addDrone(filename) {
+        addDrone(path) {
           if (this.isDead) {
             throw new Error("The queen is dead!");
           }
-          this.hive.push(new Drone(filename));
+          this.hive.push(new Drone(path));
           return this;
         }
-        addDrones(filename, n) {
+        addDrones(path, n) {
           for (let i = 0; i < n; i++) {
-            this.addDrone(filename);
+            this.addDrone(path);
           }
           return this;
         }
@@ -6349,23 +6349,21 @@
           drones.forEach((drone) => this.removeDrone(drone));
           return this;
         }
-        on(path, callback) {
-          this.hive.forEach((drone) => {
-            drone.on(path, callback);
+        on(signal, callback) {
+          const unsubs = this.hive.map((drone) => {
+            return drone.on(signal, callback);
           });
+          const unsub = () => unsubs.forEach((unsub2) => unsub2());
+          this.unsubs.push(unsub);
+          return unsub;
         }
-        off(path, callback) {
-          this.hive.forEach((drone) => {
-            drone.off(path, callback);
-          });
-        }
-        emit(path, payload) {
+        emit(signal, payload) {
           if (this.isDead) {
             throw new Error("The queen is dead!");
           }
           if (this.hive.length === 0) {
             throw new Error(
-              `The queen issued a "${path}" command, but there are no drones in the hive!`
+              `The queen issued a "${signal}" command, but there are no drones in the hive!`
             );
           }
           return new Promise((resolve, reject) => {
@@ -6376,7 +6374,7 @@
                   try {
                     this.resolves.push(resolve2);
                     this.rejects.push(reject2);
-                    drone.emit(path, payload).then((result) => {
+                    drone.emit(signal, payload).then((result) => {
                       if (!this.hasBeenDestroyed) {
                         this.resolves.remove(resolve2);
                         this.rejects.remove(reject2);
@@ -6411,8 +6409,8 @@
             }
           });
         }
-        command(path, payload) {
-          return this.emit(path, payload);
+        command(signal, payload) {
+          return this.emit(signal, payload);
         }
         destroy(error) {
           if (this.isDead) {

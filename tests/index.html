@@ -70,11 +70,11 @@
         })
       }
 
-      function postMessageAsync(drone, path, payload, ms) {
+      function postMessageAsync(drone, signal, payload, ms) {
         return new Promise((resolve, reject) => {
           try {
             pause(ms).then(() => reject("Timed out!"))
-            drone.emit(path, payload).then(resolve)
+            drone.emit(signal, payload).then(resolve)
           } catch (e) {
             return reject(e)
           }
@@ -124,7 +124,7 @@
                 let elapsedTime = 0
 
                 const callback = event => {
-                  if (event.data.path === "pulse-elapsed-time") {
+                  if (event.data.signal === "pulse-elapsed-time") {
                     elapsedTime = event.data.payload
                   }
                 }
@@ -261,6 +261,87 @@
                 return reject(e)
               }
             })
+          })()
+        })
+
+        await test("that multiple callbacks can be added the same signal by a single drone", async () => {
+          const drone = new Bee.Drone("worker.js")
+          const results = []
+
+          drone.on("called-you-back", (request, response) => {
+            results.push(request.data)
+            return response.send()
+          })
+
+          drone.on("called-you-back", (request, response) => {
+            results.push(request.data * 2)
+            return response.send()
+          })
+
+          drone.on("called-you-back", (request, response) => {
+            results.push(request.data * 4)
+            return response.send()
+          })
+
+          await drone.emit("call-me-back")
+          results.sort()
+          expect(results).toBe([234, 468, 936])
+          drone.destroy()
+        })
+
+        await test("that the `on` method's returned unsubscribe function works as expected", async () => {
+          // for drones
+          await (async () => {
+            const drone = new Bee.Drone("worker.js")
+            let count = 0
+
+            const unsub = drone.on("called-you-back", (request, response) => {
+              count++
+              return response.send()
+            })
+
+            for (let i = 0; i < 10; i++) {
+              await drone.emit("call-me-back")
+            }
+
+            expect(count).toBe(10)
+            unsub()
+
+            for (let i = 0; i < 10; i++) {
+              drone.emit("call-me-back")
+            }
+
+            setTimeout(() => {
+              expect(count).toBe(10)
+              drone.destroy()
+            }, 250)
+          })()
+
+          // for queens
+          await (async () => {
+            const queen = new Bee.Queen("worker.js")
+            let count = 0
+
+            const unsub = queen.on("called-you-back", (request, response) => {
+              count++
+              return response.send()
+            })
+
+            for (let i = 0; i < 10; i++) {
+              await queen.emit("call-me-back")
+            }
+
+            expect(count).toBe(10)
+            unsub()
+
+            for (let i = 0; i < 10; i++) {
+              queen.emit("call-me-back")
+            }
+
+            setTimeout(() => {
+              expect(count).toBe(10)
+              queen.destroy()
+            }, 250)
           })()
         })
       }

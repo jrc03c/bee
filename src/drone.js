@@ -3,11 +3,11 @@ const SubscriptionService = require("./subscription-service")
 class Drone extends SubscriptionService {
   _worker = undefined
 
-  constructor(filename) {
+  constructor(path) {
     super()
 
-    if (filename) {
-      this._worker = new Worker(filename)
+    if (path) {
+      this._worker = new Worker(path)
       this.context = this._worker
     }
   }
@@ -16,8 +16,8 @@ class Drone extends SubscriptionService {
     return this.hasBeenDestroyed
   }
 
-  propose(path, payload) {
-    return this.emit(path, payload)
+  propose(signal, payload) {
+    return this.emit(signal, payload)
   }
 
   destroy() {

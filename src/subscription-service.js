@@ -53,7 +53,7 @@ class SubscriptionService {
     this.context = globalThis
   }
 
-  on(path, callback) {
+  on(signal, callback) {
     if (this.hasBeenDestroyed) {
       throw new Error(
         "This SubscriptionService instance has already been destroyed!"
@@ -61,7 +61,7 @@ class SubscriptionService {
     }
 
     const inner = event => {
-      if (event.data.path === path) {
+      if (event.data.signal === signal) {
         const cbid = event.data.cbid
         let payload = event.data.payload
 
@@ -79,7 +79,7 @@ class SubscriptionService {
 
             if (!this.hasBeenDestroyed) {
               this.context.postMessage({
-                path: cbid,
+                signal: cbid,
                 payload: result,
               })
             }
@@ -96,7 +96,7 @@ class SubscriptionService {
     return unsub
   }
 
-  emit(path, payload) {
+  emit(signal, payload) {
     if (this.hasBeenDestroyed) {
       throw new Error(
         "This SubscriptionService instance has already been destroyed!"
@@ -108,7 +108,7 @@ class SubscriptionService {
         const cbid = makeKey(8)
 
         const callback = event => {
-          if (event.data.path === cbid) {
+          if (event.data.signal === cbid) {
             this.context.removeEventListener("message", callback)
             this.resolves.remove(resolve)
             this.rejects.remove(reject)
@@ -133,7 +133,7 @@ class SubscriptionService {
 
         this.context.postMessage({
           cbid,
-          path,
+          signal,
           payload,
         })
       } catch (e) {
@@ -144,8 +144,8 @@ class SubscriptionService {
     })
   }
 
-  trigger(path, payload) {
-    return this.emit(path, payload)
+  trigger(signal, payload) {
+    return this.emit(signal, payload)
   }
 
   destroy(error) {
@@ -182,7 +182,6 @@ class SubscriptionService {
     delete this.rejects
     delete this.resolves
     delete this.unsubs
-    // Question: Can web workers call their own `terminate` method?
   }
 }
 
