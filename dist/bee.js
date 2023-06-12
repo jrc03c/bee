@@ -6167,7 +6167,7 @@
         on(signal, callback) {
           if (this.hasBeenDestroyed) {
             throw new Error(
-              "This SubscriptionService instance has already been destroyed!"
+              `This \`${this.constructor.name}\` instance has already been destroyed!`
             );
           }
           const inner = (event) => {
@@ -6204,7 +6204,7 @@
         emit(signal, payload) {
           if (this.hasBeenDestroyed) {
             throw new Error(
-              "This SubscriptionService instance has already been destroyed!"
+              `This \`${this.constructor.name}\` instance has already been destroyed!`
             );
           }
           return new Promise((resolve, reject) => {
@@ -6245,7 +6245,7 @@
         destroy(error) {
           if (this.hasBeenDestroyed) {
             throw new Error(
-              "This SubscriptionService instance has already been destroyed!"
+              `This \`${this.constructor.name}\` instance has already been destroyed!`
             );
           }
           this._hasBeenDestroyed = true;
