@@ -117,11 +117,15 @@ Refers to `window`.
 
 #### `queen.hasBeenDestroyed`
 
-A boolean indicating whether or not the queen has been destroyed.
+A read-only boolean indicating whether or not the queen has been destroyed.
 
 #### `queen.hive`
 
 An array of `Drone` instances. These are called into action when the queen invokes her `emit` method.
+
+#### `queen.id`
+
+A read-only identifier string.
 
 #### `queen.isDead`
 
@@ -182,6 +186,10 @@ Refers to the corresponding web worker in the window context or `globalThis` in 
 #### `drone.hasBeenDestroyed`
 
 A read-only boolean indicating whether or not the drone has been destroyed.
+
+#### `drone.id`
+
+A read-only identifier string.
 
 #### `drone.isDead`
 

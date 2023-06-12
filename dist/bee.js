@@ -6152,22 +6152,39 @@
         }
         return JSON.parse(x);
       }
+      var alive = {};
       var SubscriptionService = class {
-        _hasBeenDestroyed = false;
         context = void 0;
         rejects = [];
         resolves = [];
         unsubs = [];
         constructor() {
           this.context = globalThis;
+          const id = makeKey(8);
+          Object.defineProperty(this, "id", {
+            configurable: false,
+            enumerable: true,
+            get: () => id,
+            set() {
+              throw new Error(
+                `The \`id\` property of this SubscriptionService instance is read-only!`
+              );
+            }
+          });
+          alive[this.id] = true;
         }
         get hasBeenDestroyed() {
-          return this._hasBeenDestroyed;
+          return !alive[this.id];
+        }
+        set hasBeenDestroyed(value) {
+          throw new Error(
+            `The \`hasBeenDestroyed\` property of this SubscriptionService instance is read-only! To destroy this SubscriptionService instance, invoke its \`destroy\` method.`
+          );
         }
         on(signal, callback) {
           if (this.hasBeenDestroyed) {
             throw new Error(
-              `This \`${this.constructor.name}\` instance has already been destroyed!`
+              `This SubscriptionService instance has already been destroyed!`
             );
           }
           const inner = (event) => {
@@ -6204,7 +6221,7 @@
         emit(signal, payload) {
           if (this.hasBeenDestroyed) {
             throw new Error(
-              `This \`${this.constructor.name}\` instance has already been destroyed!`
+              `This SubscriptionService instance has already been destroyed!`
             );
           }
           return new Promise((resolve, reject) => {
@@ -6245,10 +6262,10 @@
         destroy(error) {
           if (this.hasBeenDestroyed) {
             throw new Error(
-              `This \`${this.constructor.name}\` instance has already been destroyed!`
+              `This SubscriptionService instance has already been destroyed!`
             );
           }
-          this._hasBeenDestroyed = true;
+          delete alive[this.id];
           this.unsubs.forEach((unsub) => unsub());
           if (error) {
             this.rejects.forEach((reject) => reject(error));
@@ -6288,6 +6305,11 @@
         get isDead() {
           return this.hasBeenDestroyed;
         }
+        set isDead(value) {
+          throw new Error(
+            `The \`isDead\` property of this Drone instance is read-only! To destroy this Drone instance, invoke its \`destroy\` method.`
+          );
+        }
         propose(signal, payload) {
           return this.emit(signal, payload);
         }
@@ -6318,6 +6340,11 @@
         }
         get isDead() {
           return this.hasBeenDestroyed;
+        }
+        set isDead(value) {
+          throw new Error(
+            `The \`isDead\` property of this Queen instance is read-only! To destroy this Queen instance, invoke her \`destroy\` method.`
+          );
         }
         addDrone(path) {
           if (this.isDead) {

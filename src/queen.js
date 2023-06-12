@@ -17,6 +17,12 @@ class Queen extends SubscriptionService {
     return this.hasBeenDestroyed
   }
 
+  set isDead(value) {
+    throw new Error(
+      `The \`isDead\` property of this Queen instance is read-only! To destroy this Queen instance, invoke her \`destroy\` method.`
+    )
+  }
+
   addDrone(path) {
     if (this.isDead) {
       throw new Error("The queen is dead!")

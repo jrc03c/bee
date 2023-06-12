@@ -23,6 +23,12 @@ class Drone extends SubscriptionService {
     return this.hasBeenDestroyed
   }
 
+  set isDead(value) {
+    throw new Error(
+      `The \`isDead\` property of this Drone instance is read-only! To destroy this Drone instance, invoke its \`destroy\` method.`
+    )
+  }
+
   propose(signal, payload) {
     return this.emit(signal, payload)
   }

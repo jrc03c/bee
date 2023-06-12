@@ -42,8 +42,9 @@ function betterParse(x) {
   return JSON.parse(x)
 }
 
+const alive = {}
+
 class SubscriptionService {
-  _hasBeenDestroyed = false
   context = undefined
   rejects = []
   resolves = []
@@ -51,16 +52,37 @@ class SubscriptionService {
 
   constructor() {
     this.context = globalThis
+    const id = makeKey(8)
+
+    Object.defineProperty(this, "id", {
+      configurable: false,
+      enumerable: true,
+      get: () => id,
+
+      set() {
+        throw new Error(
+          `The \`id\` property of this SubscriptionService instance is read-only!`
+        )
+      },
+    })
+
+    alive[this.id] = true
   }
 
   get hasBeenDestroyed() {
-    return this._hasBeenDestroyed
+    return !alive[this.id]
+  }
+
+  set hasBeenDestroyed(value) {
+    throw new Error(
+      `The \`hasBeenDestroyed\` property of this SubscriptionService instance is read-only! To destroy this SubscriptionService instance, invoke its \`destroy\` method.`
+    )
   }
 
   on(signal, callback) {
     if (this.hasBeenDestroyed) {
       throw new Error(
-        `This \`${this.constructor.name}\` instance has already been destroyed!`
+        `This SubscriptionService instance has already been destroyed!`
       )
     }
 
@@ -103,7 +125,7 @@ class SubscriptionService {
   emit(signal, payload) {
     if (this.hasBeenDestroyed) {
       throw new Error(
-        `This \`${this.constructor.name}\` instance has already been destroyed!`
+        `This SubscriptionService instance has already been destroyed!`
       )
     }
 
@@ -151,11 +173,11 @@ class SubscriptionService {
   destroy(error) {
     if (this.hasBeenDestroyed) {
       throw new Error(
-        `This \`${this.constructor.name}\` instance has already been destroyed!`
+        `This SubscriptionService instance has already been destroyed!`
       )
     }
 
-    this._hasBeenDestroyed = true
+    delete alive[this.id]
     this.unsubs.forEach(unsub => unsub())
 
     if (error) {
