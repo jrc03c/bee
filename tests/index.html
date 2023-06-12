@@ -70,20 +70,11 @@
         })
       }
 
-      function postMessageAsync(drone, signal, payload, ms) {
-        return new Promise((resolve, reject) => {
-          try {
-            pause(ms).then(() => reject("Timed out!"))
-            drone.emit(signal, payload).then(resolve)
-          } catch (e) {
-            return reject(e)
-          }
-        })
-      }
-
       async function runTests() {
         await test("that queens can only send commands when they have drones and are alive", async () => {
           const queen = new Bee.Queen()
+          expect(queen.hasBeenDestroyed).toBe(false)
+          expect(queen.isDead).toBe(false)
 
           await expect(async () => {
             queen.command("do-something")
@@ -94,6 +85,8 @@
           expect(result).toBe(468)
 
           queen.destroy()
+          expect(queen.hasBeenDestroyed).toBe(true)
+          expect(queen.isDead).toBe(true)
 
           await expect(async () => {
             await queen.command("double", 345)
@@ -110,8 +103,12 @@
           const stop = new Date()
           expect(stop - start).toBeLessThan(duration)
 
+          expect(queen.isDead).toBe(true)
+          expect(drone.isDead).toBe(true)
+
           await expect(async () => {
-            await postMessageAsync(drone, "double", 234, 1000)
+            await pause(1000)
+            await drone.emit("double", 234)
           }).toThrowAsync()
         })
 

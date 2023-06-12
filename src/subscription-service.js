@@ -43,7 +43,7 @@ function betterParse(x) {
 }
 
 class SubscriptionService {
-  #_hasBeenDestroyed = false
+  _hasBeenDestroyed = false
   context = undefined
   rejects = []
   resolves = []
@@ -54,13 +54,13 @@ class SubscriptionService {
   }
 
   get hasBeenDestroyed() {
-    return this.#_hasBeenDestroyed
+    return this._hasBeenDestroyed
   }
 
   on(signal, callback) {
     if (this.hasBeenDestroyed) {
       throw new Error(
-        "This SubscriptionService instance has already been destroyed!"
+        `This \`${this.constructor.name}\` instance has already been destroyed!`
       )
     }
 
@@ -103,7 +103,7 @@ class SubscriptionService {
   emit(signal, payload) {
     if (this.hasBeenDestroyed) {
       throw new Error(
-        "This SubscriptionService instance has already been destroyed!"
+        `This \`${this.constructor.name}\` instance has already been destroyed!`
       )
     }
 
@@ -151,11 +151,11 @@ class SubscriptionService {
   destroy(error) {
     if (this.hasBeenDestroyed) {
       throw new Error(
-        "This SubscriptionService instance has already been destroyed!"
+        `This \`${this.constructor.name}\` instance has already been destroyed!`
       )
     }
 
-    this.#_hasBeenDestroyed = true
+    this._hasBeenDestroyed = true
     this.unsubs.forEach(unsub => unsub())
 
     if (error) {
