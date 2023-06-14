@@ -374,37 +374,38 @@
       var isDataFrame = require_is_dataframe();
       var isSeries = require_is_series();
       function copy(x) {
-        try {
-          const out = structuredClone(x);
-          return out;
-        } catch (e) {
-          if (typeof x === "object") {
-            if (x === null) {
+        function helper(x2) {
+          if (typeof x2 === "object") {
+            if (x2 === null) {
               return null;
             }
-            if (isArray(x)) {
-              return x.map((v) => copy(v));
+            if (isArray(x2)) {
+              return x2.map((v) => copy(v));
             }
-            if (isSeries(x)) {
-              const out2 = x.copy();
+            if (isSeries(x2)) {
+              const out2 = x2.copy();
               out2.values = copy(out2.values);
               return out2;
             }
-            if (isDataFrame(x)) {
-              const out2 = x.copy();
-              out2.values = copy(x.values);
+            if (isDataFrame(x2)) {
+              const out2 = x2.copy();
+              out2.values = copy(x2.values);
               return out2;
             }
-            x = decycle(x);
+            if (x2 instanceof Date) {
+              return new Date(x2.getTime());
+            }
+            x2 = decycle(x2);
             const out = {};
-            Object.keys(x).forEach((key) => {
-              out[key] = copy(x[key]);
+            Object.keys(x2).forEach((key) => {
+              out[key] = copy(x2[key]);
             });
             return out;
           } else {
-            return x;
+            return x2;
           }
         }
+        return helper(decycle(x));
       }
       function decycle(x) {
         function helper(x2, checked, currentPath) {
@@ -441,7 +442,13 @@
             return x2;
           }
         }
-        const orig = copy(x);
+        const orig = (() => {
+          try {
+            return structuredClone(x);
+          } catch (e) {
+            return x;
+          }
+        })();
         let out = helper(orig);
         if (isDataFrame(x)) {
           const temp = x.copy();
@@ -466,7 +473,6 @@
   // node_modules/@jrc03c/js-math-tools/src/flatten.js
   var require_flatten = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/flatten.js"(exports, module) {
-      var { copy } = require_copy();
       var assert = require_assert();
       var isArray = require_is_array();
       var isDataFrame = require_is_dataframe();
@@ -481,7 +487,7 @@
         );
         function helper(arr2) {
           let out = [];
-          copy(arr2).forEach((child) => {
+          arr2.forEach((child) => {
             if (isArray(child)) {
               out = out.concat(helper(child));
             } else {
@@ -496,10 +502,22 @@
     }
   });
 
+  // node_modules/@jrc03c/js-math-tools/src/is-date.js
+  var require_is_date = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/is-date.js"(exports, module) {
+      function isDate(x) {
+        return x instanceof Date && x.toString() !== "Invalid Date";
+      }
+      module.exports = isDate;
+    }
+  });
+
   // node_modules/@jrc03c/js-math-tools/src/is-equal.js
   var require_is_equal = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/is-equal.js"(exports, module) {
       var { decycle } = require_copy();
+      var isArray = require_is_array();
+      var isDate = require_is_date();
       function isEqual(a, b) {
         function helper(a2, b2) {
           const aType = typeof a2;
@@ -526,6 +544,12 @@
             if (a2 === null || b2 === null) {
               return a2 === null && b2 === null;
             } else {
+              if (isDate(a2) && isDate(b2)) {
+                return a2.getTime() === b2.getTime();
+              }
+              if (isArray(a2) !== isArray(b2)) {
+                return false;
+              }
               const aKeys = Object.keys(a2);
               const bKeys = Object.keys(b2);
               if (aKeys.length !== bKeys.length)
@@ -540,9 +564,6 @@
           }
         }
         try {
-          if (a instanceof Date && b instanceof Date) {
-            return a.getTime() === b.getTime();
-          }
           return helper(a, b);
         } catch (e) {
           return helper(decycle(a), decycle(b));
@@ -3883,6 +3904,7 @@
       var isArray = require_is_array();
       var isBoolean = require_is_boolean();
       var isDataFrame = require_is_dataframe();
+      var isDate = require_is_date();
       var isEqual = require_is_equal();
       var isNumber = require_is_number();
       var isObject = require_is_object();
@@ -3910,7 +3932,7 @@
             JSON.parse(value);
           } catch (e) {
             const dateValue = cast(value, "date");
-            if (dateValue instanceof Date) {
+            if (isDate(dateValue)) {
               return dateValue.getTime();
             }
           }
@@ -3946,7 +3968,7 @@
           }
         }
         if (type === "date") {
-          if (value instanceof Date) {
+          if (isDate(value)) {
             return value;
           }
           if (isUndefined(value)) {
@@ -3955,7 +3977,7 @@
           const valueFloat = parseFloat(value);
           if (!isNaN(valueFloat)) {
             const out = new Date(value);
-            if (out.toString() === "Invalid Date")
+            if (!isDate(out))
               return null;
             return out;
           }
@@ -5094,6 +5116,7 @@
       var flatten = require_flatten();
       var isArray = require_is_array();
       var isDataFrame = require_is_dataframe();
+      var isDate = require_is_date();
       var isNumber = require_is_number();
       var isSeries = require_is_series();
       var isString = require_is_string();
@@ -5138,8 +5161,8 @@
             return "null";
           try {
             if (typeof v === "object") {
-              const temp = new Date(v.toString());
-              if (temp instanceof Date && temp.toString() !== "Invalid Date") {
+              const temp = new Date(v.getTime());
+              if (isDate(temp)) {
                 return "date";
               }
             }
@@ -5169,7 +5192,7 @@
             return "string";
           } catch (e) {
             const vDate = new Date(v);
-            if (vDate.toString() !== "Invalid Date") {
+            if (isDate(vDate)) {
               return "date";
             }
             return "string";
