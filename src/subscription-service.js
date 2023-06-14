@@ -35,6 +35,10 @@ function betterParse(x) {
     return NaN
   }
 
+  if (x === "undefined") {
+    return undefined
+  }
+
   if (x.match(/^Symbol\(.*?\)$/g)) {
     return Symbol.for(x.replace("Symbol(", "").slice(0, -1))
   }

@@ -13,15 +13,15 @@
     "watch": "node build.js --watch",
     "pub": "npm version patch --force && npm publish --access=public"
   },
-  "dependencies": {
-    "@jrc03c/js-math-tools": "github:jrc03c/js-math-tools",
-    "@jrc03c/js-text-tools": "^0.0.11",
-    "@jrc03c/make-key": "github:jrc03c/make-key"
-  },
   "devDependencies": {
-    "@jrc03c/watch": "github:jrc03c/watch",
+    "@jrc03c/watch": "^0.0.9",
     "esbuild": "^0.14.51",
     "eslint": "^8.21.0",
     "prettier": "^2.8.8"
+  },
+  "dependencies": {
+    "@jrc03c/js-math-tools": "^0.0.49",
+    "@jrc03c/js-text-tools": "^0.0.15",
+    "@jrc03c/make-key": "^0.0.13"
   }
 }
