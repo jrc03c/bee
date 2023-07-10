@@ -1,6 +1,6 @@
 {
   "name": "@jrc03c/bee",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "description": "makes web workers easier to use",
   "main": "src/index.js",
   "keywords": [
