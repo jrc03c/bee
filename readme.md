@@ -206,3 +206,7 @@ An array of `resolve` functions (i.e., those used in a `Promise`). Generally, yo
 #### `drone.unsubs`
 
 An array of unsubscription functions (i.e., those returned from invoking the `drone.on` method). Generally, you won't need to access these directly; in fact, it's probably a bad idea to do so. They're just kept around so that all signal listeners can be turned off immediately and automatically when the drone is destroyed.
+
+# To do
+
+- Add support for [transferable objects](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects).

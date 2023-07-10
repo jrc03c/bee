@@ -1,50 +1,6 @@
-const { stringify } = require("@jrc03c/js-text-tools")
+const { parse, stringify } = require("@jrc03c/js-text-tools")
 const makeKey = require("@jrc03c/make-key")
 require("./array-prototype-remove")
-
-function betterStringify(x) {
-  if (x === Infinity) {
-    return "Infinity"
-  }
-
-  if (x === -Infinity) {
-    return "-Infinity"
-  }
-
-  if (typeof x === "number" && isNaN(x)) {
-    return "NaN"
-  }
-
-  if (typeof x === "symbol") {
-    return x.toString()
-  }
-
-  return stringify(x)
-}
-
-function betterParse(x) {
-  if (x === "Infinity") {
-    return Infinity
-  }
-
-  if (x === "-Infinity") {
-    return -Infinity
-  }
-
-  if (x === "NaN") {
-    return NaN
-  }
-
-  if (x === "undefined") {
-    return undefined
-  }
-
-  if (x.match(/^Symbol\(.*?\)$/g)) {
-    return Symbol.for(x.replace("Symbol(", "").slice(0, -1))
-  }
-
-  return JSON.parse(x)
-}
 
 const alive = {}
 
@@ -96,7 +52,7 @@ class SubscriptionService {
         let payload = event.data.payload
 
         try {
-          payload = betterParse(payload)
+          payload = parse(payload)
         } catch (e) {}
 
         const request = { data: payload }
@@ -104,7 +60,7 @@ class SubscriptionService {
         const response = {
           send: result => {
             try {
-              result = betterStringify(result)
+              result = stringify(result)
             } catch (e) {}
 
             if (!this.hasBeenDestroyed) {
@@ -146,7 +102,7 @@ class SubscriptionService {
             let out = event.data.payload
 
             try {
-              out = betterParse(out)
+              out = parse(out)
             } catch (e) {}
 
             return resolve(out)
@@ -158,7 +114,7 @@ class SubscriptionService {
         this.rejects.push(reject)
 
         try {
-          payload = betterStringify(payload)
+          payload = stringify(payload)
         } catch (e) {}
 
         this.context.postMessage({

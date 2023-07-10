@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@jrc03c/js-math-tools": "^0.0.49",
-    "@jrc03c/js-text-tools": "^0.0.15",
+    "@jrc03c/js-text-tools": "^0.0.22",
     "@jrc03c/make-key": "^0.0.13"
   }
 }
