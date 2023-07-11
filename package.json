@@ -14,14 +14,14 @@
     "pub": "npm version patch --force && npm publish --access=public"
   },
   "devDependencies": {
-    "@jrc03c/watch": "^0.0.9",
+    "@jrc03c/watch": "^0.0.10",
     "esbuild": "^0.14.51",
     "eslint": "^8.21.0",
     "prettier": "^2.8.8"
   },
   "dependencies": {
-    "@jrc03c/js-math-tools": "^0.0.49",
-    "@jrc03c/js-text-tools": "^0.0.22",
-    "@jrc03c/make-key": "^0.0.13"
+    "@jrc03c/js-math-tools": "^0.0.58",
+    "@jrc03c/js-text-tools": "^0.0.23",
+    "@jrc03c/make-key": "^0.0.14"
   }
 }
