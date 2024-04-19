@@ -58,6 +58,7 @@
     <script src="fake-jest.js"></script>
     <script src="../node_modules/@jrc03c/js-math-tools/dist/js-math-tools.js"></script>
     <script>
+      /* global Bee, expect, JSMathTools, test */
       const { decycle } = JSMathTools
 
       function pause(ms) {
@@ -115,34 +116,27 @@
         await test("that drones shut down immediately when destroyed", async () => {
           const drone = new Bee.Drone("worker.js")
 
-          await (() => {
-            return new Promise(async (resolve, reject) => {
-              try {
-                let elapsedTime = 0
+          await (async () => {
+            let elapsedTime = 0
 
-                const callback = event => {
-                  if (event.data.signal === "pulse-elapsed-time") {
-                    elapsedTime = event.data.payload
-                  }
-                }
-
-                globalThis.addEventListener("message", callback)
-                drone.emit("pulse")
-
-                await pause(250)
-                drone.destroy()
-                expect(elapsedTime).toBeLessThan(300)
-
-                const finalElapsedTime = elapsedTime
-
-                await pause(250)
-                expect(elapsedTime).toBe(finalElapsedTime)
-                globalThis.removeEventListener("message", callback)
-                resolve()
-              } catch (e) {
-                return reject(e)
+            const callback = event => {
+              if (event.data.signal === "pulse-elapsed-time") {
+                elapsedTime = event.data.payload
               }
-            })
+            }
+
+            globalThis.addEventListener("message", callback)
+            drone.emit("pulse")
+
+            await pause(250)
+            drone.destroy()
+            expect(elapsedTime).toBeLessThan(300)
+
+            const finalElapsedTime = elapsedTime
+
+            await pause(250)
+            expect(elapsedTime).toBe(finalElapsedTime)
+            globalThis.removeEventListener("message", callback)
           })()
         })
 
@@ -232,7 +226,7 @@
               try {
                 const drone = new Bee.Drone("worker.js")
 
-                drone.on("message-initiated-by-worker", (request, response) => {
+                drone.on("message-initiated-by-worker", request => {
                   expect(request.data).toBe("The worker says hi!")
                   drone.destroy()
                   resolve()
@@ -249,7 +243,7 @@
               try {
                 const queen = new Bee.Queen("worker.js")
 
-                queen.on("message-initiated-by-worker", (request, response) => {
+                queen.on("message-initiated-by-worker", request => {
                   expect(request.data).toBe("The worker says hi!")
                   queen.destroy()
                   resolve()

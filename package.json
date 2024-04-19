@@ -17,6 +17,7 @@
     "@jrc03c/watch": "^0.0.10",
     "esbuild": "^0.14.51",
     "eslint": "^8.21.0",
+    "eslint-plugin-html": "^8.1.0",
     "prettier": "^2.8.8"
   },
   "dependencies": {

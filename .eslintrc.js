@@ -8,6 +8,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: "latest",
   },
+  plugins: ["eslint-plugin-html"],
   rules: {
     "no-empty": [
       "error",
