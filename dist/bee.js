@@ -564,6 +564,9 @@
               } else if (isDate(b2)) {
                 return false;
               }
+              if (a2 instanceof RegExp && b2 instanceof RegExp) {
+                return a2.toString() === b2.toString();
+              }
               if (isArray(a2) !== isArray(b2)) {
                 return false;
               }
@@ -1979,7 +1982,7 @@
           temp.columns = temp.columns.map((col) => truncate(col, maxLength));
           temp.index = temp.index.map((row) => truncate(row, maxLength));
         }
-        console.table(temp.toObject());
+        console.table(temp.toDetailedObject());
         console.log("Shape:", df.shape, "\n");
         return df;
       }
@@ -2372,6 +2375,44 @@
     }
   });
 
+  // node_modules/@jrc03c/js-math-tools/src/dataframe/df-to-detailed-object.js
+  var require_df_to_detailed_object = __commonJS({
+    "node_modules/@jrc03c/js-math-tools/src/dataframe/df-to-detailed-object.js"(exports, module) {
+      var assert = require_assert();
+      var isUndefined = require_is_undefined();
+      function dfToDetailedObject(df, axis) {
+        if (isUndefined(axis)) {
+          axis = 0;
+        } else {
+          assert(
+            axis === 0 || axis === 1,
+            "The axis parameter of the `toDetailedObject` method must be undefined, 0, or 1. An axis of 0 indicates that the returned object should be organized first by rows and then by columns. An axis of 1 indicates that the returned object should be organized first by columns and then by rows."
+          );
+        }
+        const out = {};
+        if (axis === 0) {
+          df.index.forEach((rowName, i) => {
+            const temp = {};
+            df.columns.forEach((colName, j) => {
+              temp[colName] = df.values[i][j];
+            });
+            out[rowName] = temp;
+          });
+        } else {
+          df.columns.forEach((colName, j) => {
+            const temp = {};
+            df.index.forEach((rowName, i) => {
+              temp[rowName] = df.values[i][j];
+            });
+            out[colName] = temp;
+          });
+        }
+        return out;
+      }
+      module.exports = dfToDetailedObject;
+    }
+  });
+
   // node_modules/@jrc03c/js-math-tools/src/dataframe/df-to-json-string.js
   var require_df_to_json_string = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/dataframe/df-to-json-string.js"(exports, module) {
@@ -2434,35 +2475,11 @@
   // node_modules/@jrc03c/js-math-tools/src/dataframe/df-to-object.js
   var require_df_to_object = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/dataframe/df-to-object.js"(exports, module) {
-      var assert = require_assert();
-      var isUndefined = require_is_undefined();
-      function dfToObject(df, axis) {
-        if (isUndefined(axis)) {
-          axis = 0;
-        } else {
-          assert(
-            axis === 0 || axis === 1,
-            "The axis parameter of the `toObject` method must be undefined, 0, or 1. An axis of 0 indicates that the returned object should be organized first by rows and then by columns. An axis of 1 indicates that the returned object should be organized first by columns and then by rows."
-          );
-        }
+      function dfToObject(df) {
         const out = {};
-        if (axis === 0) {
-          df.index.forEach((rowName, i) => {
-            const temp = {};
-            df.columns.forEach((colName, j) => {
-              temp[colName] = df.values[i][j];
-            });
-            out[rowName] = temp;
-          });
-        } else {
-          df.columns.forEach((colName, j) => {
-            const temp = {};
-            df.index.forEach((rowName, i) => {
-              temp[rowName] = df.values[i][j];
-            });
-            out[colName] = temp;
-          });
-        }
+        df.columns.forEach((col) => {
+          out[col] = df.get(col).values;
+        });
         return out;
       }
       module.exports = dfToObject;
@@ -2929,25 +2946,24 @@
             }
           }
           constructor(data) {
-            const self2 = this;
-            self2.name = "data";
-            Object.defineProperty(self2, "_symbol", {
+            this.name = "data";
+            Object.defineProperty(this, "_symbol", {
               configurable: false,
               enumerable: false,
               writable: false,
               value: SERIES_SYMBOL
             });
-            Object.defineProperty(self2, "_values", {
+            Object.defineProperty(this, "_values", {
               value: [],
               configurable: true,
               enumerable: false,
               writable: true
             });
-            Object.defineProperty(self2, "values", {
+            Object.defineProperty(this, "values", {
               configurable: true,
               enumerable: true,
               get() {
-                return self2._values;
+                return this._values;
               },
               set(x) {
                 assert(isArray(x), "The new values must be a 1-dimensional array!");
@@ -2956,29 +2972,29 @@
                   dataShape.length === 1,
                   "The new array of values must be 1-dimensional!"
                 );
-                if (dataShape[0] < self2._index.length) {
-                  self2._index = self2._index.slice(0, dataShape[0]);
-                } else if (dataShape[0] > self2._index.length) {
-                  self2._index = self2._index.concat(
-                    range(self2._index.length, dataShape[0]).map((i) => {
+                if (dataShape[0] < this._index.length) {
+                  this._index = this._index.slice(0, dataShape[0]);
+                } else if (dataShape[0] > this._index.length) {
+                  this._index = this._index.concat(
+                    range(this._index.length, dataShape[0]).map((i) => {
                       return "item" + leftPad(i, (x.length - 1).toString().length);
                     })
                   );
                 }
-                self2._values = x;
+                this._values = x;
               }
             });
-            Object.defineProperty(self2, "_index", {
+            Object.defineProperty(this, "_index", {
               value: [],
               configurable: true,
               enumerable: false,
               writable: true
             });
-            Object.defineProperty(self2, "index", {
+            Object.defineProperty(this, "index", {
               configurable: true,
               enumerable: true,
               get() {
-                return self2._index;
+                return this._index;
               },
               set(x) {
                 assert(
@@ -2986,7 +3002,7 @@
                   "The new index must be a 1-dimensional array of strings!"
                 );
                 assert(
-                  x.length === self2.shape[0],
+                  x.length === this.shape[0],
                   "The new index must be the same length as the old index!"
                 );
                 assert(
@@ -2996,21 +3012,21 @@
                 x.forEach((value) => {
                   assert(isString(value), "All of the row names must be strings!");
                 });
-                self2._index = x;
+                this._index = x;
               }
             });
             if (data) {
               if (data instanceof Series) {
-                self2.name = data.name;
-                self2.values = copy(data.values);
-                self2.index = copy(data.index);
+                this.name = data.name;
+                this.values = copy(data.values);
+                this.index = copy(data.index);
               } else if (isArray(data)) {
                 const dataShape = shape(data);
                 assert(
                   dataShape.length === 1,
                   "When passing an array into the constructor of a Series, the array must be 1-dimensional!"
                 );
-                self2.values = data;
+                this.values = data;
               } else if (data instanceof Object) {
                 const keys = Object.keys(data).concat(Object.getOwnPropertySymbols(data)).map((v) => v.toString());
                 assert(
@@ -3023,139 +3039,112 @@
                   shape(values).length === 1,
                   "When passing an object into the constructor of a Series, the object must have only 1 key-value pair, where the key is the name of the data and the value is the 1-dimensional array of values!"
                 );
-                self2.name = name;
-                self2.values = values.slice();
+                this.name = name;
+                this.values = values.slice();
               }
             }
           }
           get shape() {
-            const self2 = this;
-            return shape(self2.values);
+            return shape(this.values);
           }
           get length() {
-            const self2 = this;
-            return self2.shape[0];
+            return this.shape[0];
           }
           get isEmpty() {
-            const self2 = this;
-            return self2.values.filter((v) => !isUndefined(v)).length === 0;
+            return this.values.filter((v) => !isUndefined(v)).length === 0;
           }
           clear() {
-            const self2 = this;
-            const out = self2.copy();
+            const out = this.copy();
             out.values.forEach((v, i) => {
               out.values[i] = void 0;
             });
             return out;
           }
           get(indices) {
-            const self2 = this;
-            return seriesGet(self2, indices);
+            return seriesGet(this, indices);
           }
           getSubsetByNames(indices) {
-            const self2 = this;
-            return seriesGetSubsetByNames(Series, self2, indices);
+            return seriesGetSubsetByNames(Series, this, indices);
           }
           getSubsetByIndices(indices) {
-            const self2 = this;
-            return seriesGetSubsetByIndices(self2, indices);
+            return seriesGetSubsetByIndices(this, indices);
           }
           loc(indices) {
-            const self2 = this;
-            return self2.getSubsetByNames(indices);
+            return this.getSubsetByNames(indices);
           }
           iloc(indices) {
-            const self2 = this;
-            return self2.getSubsetByIndices(indices);
+            return this.getSubsetByIndices(indices);
           }
           reverse() {
-            const self2 = this;
-            const out = new Series(reverse(self2.values));
-            out.index = reverse(self2.index);
-            out.name = self2.name;
+            const out = new Series(reverse(this.values));
+            out.index = reverse(this.index);
+            out.name = this.name;
             return out;
           }
           resetIndex() {
-            const self2 = this;
-            const out = self2.copy();
-            out.index = range(0, self2.shape[0]).map((i) => {
+            const out = this.copy();
+            out.index = range(0, this.shape[0]).map((i) => {
               return "item" + leftPad(i, (out.index.length - 1).toString().length);
             });
             return out;
           }
           copy() {
-            const self2 = this;
             const out = new Series();
-            out._values = copy(self2.values);
-            out._index = copy(self2.index);
-            out.name = self2.name;
+            out._values = copy(this.values);
+            out._index = copy(this.index);
+            out.name = this.name;
             return out;
           }
           append(x) {
-            const self2 = this;
-            return seriesAppend(Series, self2, x);
+            return seriesAppend(Series, this, x);
           }
           apply(fn) {
-            const self2 = this;
-            return seriesApply(self2, fn);
+            return seriesApply(this, fn);
           }
           concat(x) {
-            const self2 = this;
-            return self2.append(x);
+            return this.append(x);
           }
           dropMissing(condition, threshold) {
-            const self2 = this;
-            return seriesDropMissing(self2, condition, threshold);
+            return seriesDropMissing(this, condition, threshold);
           }
           dropNaN() {
-            const self2 = this;
-            return seriesDropNaN(Series, self2);
+            return seriesDropNaN(Series, this);
           }
           toObject() {
-            const self2 = this;
-            return seriesToObject(self2);
+            return seriesToObject(this);
           }
           print() {
-            const self2 = this;
-            return seriesPrint(self2);
+            return seriesPrint(this);
           }
           shuffle() {
-            const self2 = this;
-            return seriesShuffle(self2);
+            return seriesShuffle(this);
           }
           sort(direction) {
-            const self2 = this;
-            return seriesSort(Series, self2, direction);
+            return seriesSort(Series, this, direction);
           }
           sortByIndex() {
-            const self2 = this;
-            return seriesSortByIndex(Series, self2);
+            return seriesSortByIndex(Series, this);
           }
           filter(fn) {
-            const self2 = this;
-            return seriesFilter(Series, self2, fn);
+            return seriesFilter(Series, this, fn);
           }
           toDataFrame() {
-            const self2 = this;
-            const out = new DataFrame(transpose([self2.values]));
-            out.columns = [self2.name];
-            out.index = self2.index;
+            const out = new DataFrame(transpose([this.values]));
+            out.columns = [this.name];
+            out.index = this.index;
             return out;
           }
           transpose() {
-            const self2 = this;
-            const out = self2.copy();
+            const out = this.copy();
             out.values = reverse(out.values);
             out.index = reverse(out.index);
             return out;
           }
           getDummies() {
-            const self2 = this;
-            return self2.toDataFrame().getDummies();
+            return this.toDataFrame().getDummies();
           }
           oneHotEncode() {
-            const self2 = this;
-            return self2.getDummies();
+            return this.getDummies();
           }
         }
         return Series;
@@ -3185,6 +3174,7 @@
       var dfResetIndex = require_df_reset_index();
       var dfShuffle = require_df_shuffle();
       var dfSort = require_df_sort();
+      var dfToDetailedObject = require_df_to_detailed_object();
       var dfToJSON = require_df_to_json();
       var dfToJSONString = require_df_to_json_string();
       var dfToObject = require_df_to_object();
@@ -3195,6 +3185,7 @@
       var leftPad = require_left_pad();
       var ndarray = require_ndarray();
       var range = require_range();
+      var set = require_set();
       var shape = require_shape();
       var transpose = require_transpose();
       var DATAFRAME_SYMBOL = Symbol.for("@jrc03c/js-math-tools/dataframe");
@@ -3214,27 +3205,26 @@
           }
         }
         constructor(data) {
-          const self2 = this;
-          Object.defineProperty(self2, "_symbol", {
+          Object.defineProperty(this, "_symbol", {
             configurable: false,
             enumerable: false,
             writable: false,
             value: DATAFRAME_SYMBOL
           });
-          Object.defineProperty(self2, "_values", {
+          Object.defineProperty(this, "_values", {
             value: [],
             configurable: true,
             enumerable: false,
             writable: true
           });
-          Object.defineProperty(self2, "values", {
+          Object.defineProperty(this, "values", {
             configurable: true,
             enumerable: true,
             get() {
-              if (self2._values.length === 0 || !isUndefined(self2._values[0]) && self2._values[0].length === 0) {
+              if (this._values.length === 0 || !isUndefined(this._values[0]) && this._values[0].length === 0) {
                 return [[]];
               }
-              return self2._values;
+              return this._values;
             },
             set(x) {
               assert(isArray(x), "The new values must be a 2-dimensional array!");
@@ -3243,38 +3233,38 @@
                 dataShape.length === 2,
                 "The new array of values must be 2-dimensional!"
               );
-              if (dataShape[0] < self2._index.length) {
-                self2._index = self2._index.slice(0, dataShape[0]);
-              } else if (dataShape[0] > self2._index.length) {
-                self2._index = self2._index.concat(
-                  range(self2._index.length, dataShape[0]).map((i) => {
+              if (dataShape[0] < this._index.length) {
+                this._index = this._index.slice(0, dataShape[0]);
+              } else if (dataShape[0] > this._index.length) {
+                this._index = this._index.concat(
+                  range(this._index.length, dataShape[0]).map((i) => {
                     return "row" + leftPad(i, (dataShape[0] - 1).toString().length);
                   })
                 );
               }
-              if (dataShape[1] < self2._columns.length) {
-                self2._columns = self2._columns.slice(0, dataShape[1]);
-              } else if (dataShape[1] > self2._columns.length) {
-                self2._columns = self2._columns.concat(
-                  range(self2._columns.length, dataShape[1]).map((i) => {
+              if (dataShape[1] < this._columns.length) {
+                this._columns = this._columns.slice(0, dataShape[1]);
+              } else if (dataShape[1] > this._columns.length) {
+                this._columns = this._columns.concat(
+                  range(this._columns.length, dataShape[1]).map((i) => {
                     return "col" + leftPad(i, (dataShape[1] - 1).toString().length);
                   })
                 );
               }
-              self2._values = x;
+              this._values = x;
             }
           });
-          Object.defineProperty(self2, "_columns", {
+          Object.defineProperty(this, "_columns", {
             value: [],
             configurable: true,
             enumerable: false,
             writable: true
           });
-          Object.defineProperty(self2, "columns", {
+          Object.defineProperty(this, "columns", {
             configurable: true,
             enumerable: true,
             get() {
-              return self2._columns;
+              return this._columns;
             },
             set(x) {
               assert(
@@ -3282,7 +3272,7 @@
                 "The new columns list must be a 1-dimensional array of strings!"
               );
               assert(
-                self2.isEmpty || x.length === self2.shape[1],
+                this.isEmpty || x.length === this.shape[1],
                 "The new columns list must be the same length as the old columns list!"
               );
               assert(
@@ -3312,20 +3302,20 @@
                 }
                 return v;
               });
-              self2._columns = x;
+              this._columns = x;
             }
           });
-          Object.defineProperty(self2, "_index", {
+          Object.defineProperty(this, "_index", {
             value: [],
             configurable: true,
             enumerable: false,
             writable: true
           });
-          Object.defineProperty(self2, "index", {
+          Object.defineProperty(this, "index", {
             configurable: true,
             enumerable: true,
             get() {
-              return self2._index;
+              return this._index;
             },
             set(x) {
               assert(
@@ -3333,7 +3323,7 @@
                 "The new index must be a 1-dimensional array of strings!"
               );
               assert(
-                self2.isEmpty || x.length === self2.shape[0],
+                this.isEmpty || x.length === this.shape[0],
                 "The new index must be the same length as the old index!"
               );
               assert(
@@ -3363,7 +3353,7 @@
                 }
                 return v;
               });
-              self2._index = x;
+              this._index = x;
             }
           });
           assert(
@@ -3372,186 +3362,169 @@
           );
           if (data) {
             if (data instanceof DataFrame) {
-              self2.values = copy(data.values);
-              self2.columns = copy(data.columns);
-              self2.index = copy(data.index);
+              this.values = copy(data.values);
+              this.columns = copy(data.columns);
+              this.index = copy(data.index);
             } else if (isArray(data)) {
               const dataShape = shape(data);
               assert(
                 dataShape.length === 2,
                 "The `data` array passed into the constructor of a DataFrame must be 2-dimensional!"
               );
-              self2.values = data;
+              assert(
+                set(data.map((row) => row.length)).length === 1,
+                "The 2-dimensional array passed into the constructor of a DataFrame must not contain sub-arrays (i.e., rows) of different lengths!"
+              );
+              this.values = data;
             } else {
-              self2._columns = Object.keys(data).concat(Object.getOwnPropertySymbols(data)).map((v) => v.toString());
+              this._columns = Object.keys(data).concat(Object.getOwnPropertySymbols(data)).map((v) => v.toString());
               const temp = [];
-              self2._columns.forEach((col) => {
+              let lastColName = null;
+              let lastColLength = null;
+              this._columns.forEach((col) => {
+                if (isUndefined(lastColLength)) {
+                  lastColName = col;
+                  lastColLength = data[col].length;
+                }
+                assert(
+                  data[col].length === lastColLength,
+                  `The object passed into the DataFrame constructor contains arrays of different lengths! The key "${lastColName}" points to an array containing ${lastColLength} items, and the key "${col}" points to an array containing ${data[col].length} items.`
+                );
+                lastColLength = data[col].length;
                 const values = data[col];
                 temp.push(values);
               });
-              self2._values = transpose(temp);
-              const dataShape = shape(self2.values);
-              self2._index = range(0, dataShape[0]).map((i) => {
+              this._values = transpose(temp);
+              const dataShape = shape(this.values);
+              this._index = range(0, dataShape[0]).map((i) => {
                 return "row" + leftPad(i, (dataShape[0] - 1).toString().length);
               });
             }
           }
         }
         get shape() {
-          const self2 = this;
-          return shape(self2.values);
+          return shape(this.values);
         }
         get length() {
-          const self2 = this;
-          return self2.shape[0];
+          return this.shape[0];
         }
         get width() {
-          const self2 = this;
-          return self2.shape[1];
+          return this.shape[1];
         }
         get rows() {
-          const self2 = this;
-          return self2.index;
+          return this.index;
         }
         set rows(rows) {
-          const self2 = this;
-          self2.index = rows;
+          this.index = rows;
         }
         get isEmpty() {
-          const self2 = this;
-          return flatten(self2.values).length === 0;
+          return flatten(this.values).length === 0;
         }
         clear() {
-          const self2 = this;
-          const out = new DataFrame(ndarray(self2.shape));
-          out.columns = self2.columns.slice();
-          out.index = self2.index.slice();
+          const out = new DataFrame(ndarray(this.shape));
+          out.columns = this.columns.slice();
+          out.index = this.index.slice();
           return out;
         }
         get(rows, cols) {
-          const self2 = this;
           if (arguments.length === 0) {
-            return self2;
+            return this;
           }
           if (arguments.length === 1) {
             try {
-              return self2.get(null, rows);
+              return this.get(null, rows);
             } catch (e) {
-              return self2.get(rows, null);
+              return this.get(rows, null);
             }
           }
-          return dfGet(self2, rows, cols);
+          return dfGet(this, rows, cols);
         }
         getSubsetByNames(rows, cols) {
-          const self2 = this;
-          return dfGetSubsetByNames(DataFrame, Series, self2, rows, cols);
+          return dfGetSubsetByNames(DataFrame, Series, this, rows, cols);
         }
         getSubsetByIndices(rowIndices, colIndices) {
-          const self2 = this;
-          return dfGetSubsetByIndices(self2, rowIndices, colIndices);
+          return dfGetSubsetByIndices(this, rowIndices, colIndices);
         }
         getDummies(columns) {
-          const self2 = this;
-          return dfGetDummies(DataFrame, self2, columns);
+          return dfGetDummies(DataFrame, this, columns);
         }
         oneHotEncode(columns) {
-          const self2 = this;
-          return dfGetDummies(DataFrame, self2, columns);
+          return dfGetDummies(DataFrame, this, columns);
         }
         transpose() {
-          const self2 = this;
-          const out = new DataFrame(transpose(self2.values));
-          out.columns = self2.index.slice();
-          out.index = self2.columns.slice();
+          const out = new DataFrame(transpose(this.values));
+          out.columns = this.index.slice();
+          out.index = this.columns.slice();
           return out;
         }
         get T() {
-          const self2 = this;
-          return self2.transpose();
+          return this.transpose();
         }
         resetIndex(shouldSkipCopying) {
-          const self2 = this;
-          return dfResetIndex(self2, shouldSkipCopying);
+          return dfResetIndex(this, shouldSkipCopying);
         }
         copy() {
-          const self2 = this;
-          return dfCopy(DataFrame, self2);
+          return dfCopy(DataFrame, this);
         }
         assign(p1, p2) {
-          const self2 = this;
-          return dfAssign(DataFrame, Series, self2, p1, p2);
+          return dfAssign(DataFrame, Series, this, p1, p2);
         }
         apply(fn, axis) {
-          const self2 = this;
-          return dfApply(DataFrame, Series, self2, fn, axis);
+          return dfApply(DataFrame, Series, this, fn, axis);
         }
         dropMissing(axis, condition, threshold) {
-          const self2 = this;
-          return dfDropMissing(DataFrame, Series, self2, axis, condition, threshold);
+          return dfDropMissing(DataFrame, Series, this, axis, condition, threshold);
         }
         dropNaN(axis, condition, threshold) {
-          const self2 = this;
-          return dfDropNaN(DataFrame, self2, axis, condition, threshold);
+          return dfDropNaN(DataFrame, this, axis, condition, threshold);
         }
         drop(rows, cols) {
-          const self2 = this;
-          return dfDrop(DataFrame, Series, self2, rows, cols);
+          return dfDrop(DataFrame, Series, this, rows, cols);
         }
         dropColumns(columns) {
-          const self2 = this;
-          return self2.drop(null, columns);
+          return this.drop(null, columns);
         }
         dropRows(rows) {
-          const self2 = this;
-          return self2.drop(rows, null);
+          return this.drop(rows, null);
         }
-        toObject(axis) {
-          const self2 = this;
-          return dfToObject(self2, axis);
+        toDetailedObject(axis) {
+          return dfToDetailedObject(this, axis);
+        }
+        toObject() {
+          return dfToObject(this);
         }
         toJSONString(axis) {
-          const self2 = this;
-          return dfToJSONString(self2, axis);
+          return dfToJSONString(this, axis);
         }
         saveAsJSON(filename, axis) {
-          const self2 = this;
-          return dfToJSON(self2, filename, axis);
+          return dfToJSON(this, filename, axis);
         }
         print() {
-          const self2 = this;
-          return dfPrint(DataFrame, Series, self2);
+          return dfPrint(DataFrame, Series, this);
         }
         sort(cols, directions) {
-          const self2 = this;
-          return dfSort(self2, cols, directions);
+          return dfSort(this, cols, directions);
         }
         sortByIndex() {
-          const self2 = this;
-          return self2.sort();
+          return this.sort();
         }
         filter(fn, axis) {
-          const self2 = this;
-          return dfFilter(DataFrame, Series, self2, fn, axis);
+          return dfFilter(DataFrame, Series, this, fn, axis);
         }
         shuffle(axis) {
-          const self2 = this;
-          return dfShuffle(self2, axis);
+          return dfShuffle(this, axis);
         }
         append(x, axis) {
-          const self2 = this;
-          return dfAppend(self2, x, axis);
+          return dfAppend(this, x, axis);
         }
         concat(x, axis) {
-          const self2 = this;
-          return self2.append(x, axis);
+          return this.append(x, axis);
         }
         join(x, axis) {
-          const self2 = this;
-          return self2.append(x, axis);
+          return this.append(x, axis);
         }
         toString() {
-          const self2 = this;
-          return JSON.stringify(self2);
+          return JSON.stringify(this);
         }
       };
       var Series = require_series()(DataFrame);
@@ -3576,7 +3549,14 @@
           "The `max` function only works on arrays, Series, and DataFrames!"
         );
         try {
-          return Math.max(...flatten(arr));
+          arr = flatten(arr);
+          let highest = -Infinity;
+          for (const v of arr) {
+            if (v > highest) {
+              highest = v;
+            }
+          }
+          return highest;
         } catch (e) {
           return NaN;
         }
@@ -3863,7 +3843,14 @@
           "The `min` function only works on arrays, Series, and DataFrames!"
         );
         try {
-          return Math.min(...flatten(arr));
+          arr = flatten(arr);
+          let lowest = Infinity;
+          for (const v of arr) {
+            if (v < lowest) {
+              lowest = v;
+            }
+          }
+          return lowest;
         } catch (e) {
           return NaN;
         }
@@ -6041,6 +6028,15 @@
               }
               return Symbol.for(x2);
             }
+            const xTrimmed = x2.trim();
+            if (xTrimmed.match(/^\/.*?\/(d|g|i|m|s|u|v|y)*?$/g)) {
+              try {
+                const pattern = xTrimmed.replace(/^\//g, "").replace(/\/(d|g|i|m|s|u|v|y)*?$/g, "");
+                const flags = xTrimmed.match(/\/(d|g|i|m|s|u|v|y)*?$/g).at(-1).split("/").at(-1);
+                return new RegExp(pattern, flags);
+              } catch (e) {
+              }
+            }
             try {
               const f = parseFloat(x2);
               if (!isNaN(f) && f.toString() === x2) {
@@ -6092,6 +6088,18 @@
         return helper(x);
       }
       module.exports = parse;
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/pascalify.js
+  var require_pascalify = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/pascalify.js"(exports, module) {
+      var camelify = require_camelify();
+      function pascalify(text) {
+        const out = camelify(text);
+        return out[0].toUpperCase() + out.slice(1);
+      }
+      module.exports = pascalify;
     }
   });
 
@@ -6208,6 +6216,9 @@
           }
           if (typeof x2 === "function") {
             return JSON.stringify(x2.toString());
+          }
+          if (x2 instanceof RegExp) {
+            return x2.toString();
           }
           if (typeof x2 === "object") {
             if (x2 === null) {
@@ -6333,6 +6344,7 @@
         indent: require_indent(),
         kebabify: require_kebabify(),
         parse: require_parse(),
+        pascalify: require_pascalify(),
         snakeify: require_snakeify(),
         stringify: require_stringify(),
         unindent: require_unindent(),
