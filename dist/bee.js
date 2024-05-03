@@ -6037,6 +6037,12 @@
               } catch (e) {
               }
             }
+            if (x2.trim().match(/^".*?"$/g)) {
+              try {
+                return JSON.parse(x2);
+              } catch (e) {
+              }
+            }
             try {
               const f = parseFloat(x2);
               if (!isNaN(f) && f.toString() === x2) {

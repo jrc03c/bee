@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@jrc03c/js-math-tools": "^0.0.63",
-    "@jrc03c/js-text-tools": "^0.0.26",
+    "@jrc03c/js-text-tools": "^0.0.27",
     "@jrc03c/make-key": "^0.0.15"
   }
 }
