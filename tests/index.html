@@ -13,6 +13,13 @@
       .result {
         text-indent: -3em;
         padding-left: 3em;
+        color: gray;
+      }
+
+      .result::before {
+        content: "⚫";
+        font-weight: bold;
+        margin-right: 0.5em;
       }
 
       .running {
@@ -31,8 +38,6 @@
 
       .success::before {
         content: "🟢";
-        font-weight: bold;
-        margin-right: 0.5em;
       }
 
       .error {
@@ -41,8 +46,14 @@
 
       .error::before {
         content: "🔴";
-        font-weight: bold;
-        margin-right: 0.5em;
+      }
+
+      .info {
+        color: blue;
+      }
+
+      .info::before {
+        content: "🔵";
       }
 
       .reason {
@@ -336,7 +347,7 @@
           })()
         })
 
-        test("that errors are thrown when attempting to write to read-only properties", () => {
+        await test("that errors are thrown when attempting to write to read-only properties", () => {
           const queen = new Bee.Queen("worker.js")
 
           expect(() => {
@@ -353,6 +364,12 @@
 
           queen.destroy()
         })
+
+        const done = document.createElement("div")
+        done.classList.add("result")
+        done.classList.add("info")
+        done.innerHTML = "DONE!"
+        document.querySelector("#container").appendChild(done)
       }
 
       runTests()

@@ -14,7 +14,7 @@ async function test(desc, fn) {
     el.classList.add("success")
   } catch (e) {
     const text = e ? e.toString() : ""
-    el.innerHTML += `<span class="reason">(${text.toString()})</reason>`
+    el.innerHTML += `<span class="reason">(${text.toString()})</span>`
     el.classList.add("error")
   }
 

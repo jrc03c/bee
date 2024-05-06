@@ -6021,12 +6021,15 @@
       function parse(x) {
         function helper(x2) {
           if (typeof x2 === "string") {
+            if (x2.trim().match(/^("|')?Symbol\(@String\).*?("|')?$/g)) {
+              return x2.trim().replace(/^("|')?Symbol\(@String\):/g, "").replace(/("|')?$/g, "");
+            }
             if (x2.match(/^'?"?Symbol\(.*?\)"?'?$/g)) {
-              x2 = x2.replace(/^.*?Symbol\(/g, "").replace(/\).*?$/g, "");
-              if (x2 in specials) {
-                return specials[x2];
+              const xTemp = x2.replace(/^.*?Symbol\(/g, "").replace(/\).*?$/g, "");
+              if (xTemp in specials) {
+                return specials[xTemp];
               }
-              return Symbol.for(x2);
+              return Symbol.for(xTemp);
             }
             const xTrimmed = x2.trim();
             if (xTrimmed.match(/^\/.*?\/(d|g|i|m|s|u|v|y)*?$/g)) {
@@ -6060,7 +6063,15 @@
             try {
               return JSON.parse(x2, function(key, value) {
                 try {
-                  return parse(value);
+                  const out = helper(value);
+                  if (typeof out === "string") {
+                    if (typeof helper(out) !== "string") {
+                      return JSON.stringify(out);
+                    } else {
+                      return out;
+                    }
+                  }
+                  return out;
                 } catch (e) {
                   return value;
                 }
@@ -6078,15 +6089,23 @@
             } catch (e) {
               Object.keys(x2).concat(Object.getOwnPropertySymbols(x2)).forEach((key) => {
                 try {
+                  let origKey = key;
                   try {
-                    key = parse(key);
+                    key = helper(key);
                   } catch (e2) {
                   }
-                  x2[key] = parse(x2[key]);
+                  x2[key] = helper(x2[origKey]);
+                  if (key !== origKey) {
+                    delete x2[origKey];
+                  }
                 } catch (e2) {
                 }
               });
-              return x2;
+              try {
+                return convertObjectToTypedArray(x2);
+              } catch (e2) {
+                return x2;
+              }
             }
           }
           return x2;
@@ -6209,7 +6228,7 @@
             return x2.toString();
           }
           if (typeof x2 === "string") {
-            return JSON.stringify(x2);
+            return JSON.stringify("Symbol(@String):" + x2);
           }
           if (typeof x2 === "boolean") {
             return x2.toString();
@@ -6270,7 +6289,8 @@
               })();
               if (isString(child))
                 child = child.trim();
-              return prefix(indent2, depth + 1) + helper(key) + ":" + (indent2 ? " " : "") + child;
+              const stringifiedKey = typeof key === "symbol" ? helper(key) : JSON.stringify(key);
+              return prefix(indent2, depth + 1) + stringifiedKey + ":" + (indent2 ? " " : "") + child;
             }).join("," + newline) + newline + prefix(indent2, depth) + "}";
           }
           return "undefined";
