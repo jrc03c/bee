@@ -6008,145 +6008,6 @@
     }
   });
 
-  // node_modules/@jrc03c/js-text-tools/src/parse.js
-  var require_parse = __commonJS({
-    "node_modules/@jrc03c/js-text-tools/src/parse.js"(exports, module) {
-      var convertObjectToTypedArray = require_convert_object_to_typed_array();
-      var specials = {
-        "@Infinity": Infinity,
-        "@NegativeInfinity": -Infinity,
-        "@NaN": NaN,
-        "@undefined": void 0
-      };
-      function parse(x) {
-        function helper(x2) {
-          if (typeof x2 === "string") {
-            if (x2.trim().match(/^("|')?Symbol\(@String\).*?("|')?$/g)) {
-              return x2.trim().replace(/^("|')?Symbol\(@String\):/g, "").replace(/("|')?$/g, "");
-            }
-            if (x2.match(/^'?"?Symbol\(.*?\)"?'?$/g)) {
-              const xTemp = x2.replace(/^.*?Symbol\(/g, "").replace(/\).*?$/g, "");
-              if (xTemp in specials) {
-                return specials[xTemp];
-              }
-              return Symbol.for(xTemp);
-            }
-            const xTrimmed = x2.trim();
-            if (xTrimmed.match(/^\/.*?\/(d|g|i|m|s|u|v|y)*?$/g)) {
-              try {
-                const pattern = xTrimmed.replace(/^\//g, "").replace(/\/(d|g|i|m|s|u|v|y)*?$/g, "");
-                const flags = xTrimmed.match(/\/(d|g|i|m|s|u|v|y)*?$/g).at(-1).split("/").at(-1);
-                return new RegExp(pattern, flags);
-              } catch (e) {
-              }
-            }
-            if (x2.trim().match(/^".*?"$/g)) {
-              try {
-                return JSON.parse(x2);
-              } catch (e) {
-              }
-            }
-            try {
-              const f = parseFloat(x2);
-              if (!isNaN(f) && f.toString() === x2) {
-                return f;
-              }
-            } catch (e) {
-            }
-            try {
-              const d = new Date(Date.parse(x2));
-              if (d.toString() !== "Invalid Date") {
-                return d;
-              }
-            } catch (e) {
-            }
-            try {
-              return JSON.parse(x2, function(key, value) {
-                try {
-                  const out = helper(value);
-                  if (typeof out === "string") {
-                    if (typeof helper(out) !== "string") {
-                      return JSON.stringify(out);
-                    } else {
-                      return out;
-                    }
-                  }
-                  return out;
-                } catch (e) {
-                  return value;
-                }
-              });
-            } catch (e) {
-              return x2;
-            }
-          }
-          if (typeof x2 === "object") {
-            if (x2 === null) {
-              return null;
-            }
-            try {
-              return convertObjectToTypedArray(x2);
-            } catch (e) {
-              Object.keys(x2).concat(Object.getOwnPropertySymbols(x2)).forEach((key) => {
-                try {
-                  let origKey = key;
-                  try {
-                    key = helper(key);
-                  } catch (e2) {
-                  }
-                  x2[key] = helper(x2[origKey]);
-                  if (key !== origKey) {
-                    delete x2[origKey];
-                  }
-                } catch (e2) {
-                }
-              });
-              try {
-                return convertObjectToTypedArray(x2);
-              } catch (e2) {
-                return x2;
-              }
-            }
-          }
-          return x2;
-        }
-        return helper(x);
-      }
-      module.exports = parse;
-    }
-  });
-
-  // node_modules/@jrc03c/js-text-tools/src/pascalify.js
-  var require_pascalify = __commonJS({
-    "node_modules/@jrc03c/js-text-tools/src/pascalify.js"(exports, module) {
-      var camelify = require_camelify();
-      function pascalify(text) {
-        const out = camelify(text);
-        return out[0].toUpperCase() + out.slice(1);
-      }
-      module.exports = pascalify;
-    }
-  });
-
-  // node_modules/@jrc03c/js-text-tools/src/snakeify.js
-  var require_snakeify = __commonJS({
-    "node_modules/@jrc03c/js-text-tools/src/snakeify.js"(exports, module) {
-      var strip = require_strip();
-      function snakeify(text) {
-        if (typeof text !== "string") {
-          throw new Error("`text` must be a string!");
-        }
-        const words = strip(text).split(" ");
-        if (words.length === 0)
-          return "";
-        if (words.length === 1)
-          return words[0];
-        return words.join("_");
-      }
-      module.exports = snakeify;
-    }
-  });
-
   // node_modules/@jrc03c/js-text-tools/src/helpers/convert-typed-array-to-object.js
   var require_convert_typed_array_to_object = __commonJS({
     "node_modules/@jrc03c/js-text-tools/src/helpers/convert-typed-array-to-object.js"(exports, module) {
@@ -6186,6 +6047,268 @@
         );
       }
       module.exports = convertTypedArrayToObject;
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/helpers/is-a-number-string.js
+  var require_is_a_number_string = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/helpers/is-a-number-string.js"(exports, module) {
+      function isANumberString(x) {
+        x = x.trim();
+        return !!(x.match(/^-?\d+(\.\d+)?$/g) || x.match(/^-?\d+(\.\d+)?e-?\d+(\.\d+)?$/g) || x.match(/^-?\.\d+$/g) || x === "NaN");
+      }
+      module.exports = isANumberString;
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/helpers/index.js
+  var require_helpers = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/helpers/index.js"(exports, module) {
+      module.exports = {
+        convertObjectToTypedArray: require_convert_object_to_typed_array(),
+        convertTypedArrayToObject: require_convert_typed_array_to_object(),
+        isANumberString: require_is_a_number_string(),
+        punctuation: require_punctuation(),
+        replaceAll: require_replace_all(),
+        strip: require_strip()
+      };
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/parse.js
+  var require_parse = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/parse.js"(exports, module) {
+      var { isArray } = require_src();
+      var { convertObjectToTypedArray, isANumberString } = require_helpers();
+      var specials = {
+        "@Infinity": Infinity,
+        "@NegativeInfinity": -Infinity,
+        "@NaN": NaN,
+        "@undefined": void 0
+      };
+      function fixUndefineds(x) {
+        if (typeof x === "object") {
+          if (x === null) {
+            return x;
+          }
+          if (isArray(x)) {
+            for (let i = 0; i < x.length; i++) {
+              x[i] = fixUndefineds(x[i]);
+            }
+          } else {
+            Object.keys(x).concat(Object.getOwnPropertySymbols(x)).forEach((key) => {
+              x[key] = fixUndefineds(x[key]);
+            });
+          }
+          return x;
+        } else {
+          if (typeof x === "undefined") {
+            return void 0;
+          }
+          return x;
+        }
+      }
+      function parseAsNumber(x) {
+        if (typeof x !== "string") {
+          if (typeof x === "number") {
+            return x;
+          } else {
+            return;
+          }
+        }
+        if (isANumberString(x)) {
+          return parseFloat(x);
+        }
+      }
+      function parseAsString(x) {
+        if (typeof x !== "string") {
+          return;
+        }
+        if (x.trim().match(/^("|')?Symbol\(@String\):.*?("|')?$/g)) {
+          let out = x.replace("Symbol(@String):", "");
+          if (out.match(/^".*?"$/g)) {
+            out = out.substring(1, out.length - 1);
+          }
+          return out;
+        }
+      }
+      function parseAsSymbol(x) {
+        if (typeof x !== "string") {
+          if (typeof x === "symbol") {
+            return { out: x, isASymbol: true };
+          } else {
+            return;
+          }
+        }
+        if (x.trim().match(/^'?"?Symbol\(.*?\)"?'?$/g)) {
+          const xTemp = x.replace(/^.*?Symbol\(/g, "").replace(/\).*?$/g, "");
+          if (xTemp in specials) {
+            return { out: specials[xTemp], isASymbol: true };
+          }
+          return { out: Symbol.for(xTemp), isASymbol: true };
+        }
+      }
+      function parseAsRegex(x) {
+        if (typeof x !== "string") {
+          if (x instanceof RegExp) {
+            return x;
+          } else {
+            return;
+          }
+        }
+        const xTrimmed = x.trim();
+        if (xTrimmed.match(/^\/.*?\/(d|g|i|m|s|u|v|y)*?$/g)) {
+          try {
+            const pattern = xTrimmed.replace(/^\//g, "").replace(/\/(d|g|i|m|s|u|v|y)*?$/g, "");
+            const flags = xTrimmed.match(/\/(d|g|i|m|s|u|v|y)*?$/g).at(-1).split("/").at(-1);
+            return new RegExp(pattern, flags);
+          } catch (e) {
+          }
+        }
+      }
+      function parseWithJSONParse(x) {
+        if (typeof x !== "string") {
+          if (typeof x === "object") {
+            return x;
+          } else {
+            return;
+          }
+        }
+        try {
+          let out = JSON.parse(x, (key, value) => {
+            try {
+              return parse(value);
+            } catch (e) {
+              return value;
+            }
+          });
+          if (isArray(out)) {
+            out = fixUndefineds(out);
+          }
+          return out;
+        } catch (e) {
+        }
+      }
+      function parseAsDate(x) {
+        if (typeof x !== "string") {
+          if (x instanceof Date && x.toString() !== "Invalid Date") {
+            return x;
+          } else {
+            return;
+          }
+        }
+        try {
+          const d = new Date(Date.parse(x));
+          if (d.toString() !== "Invalid Date") {
+            return d;
+          }
+        } catch (e) {
+        }
+      }
+      function parseObjectKeysAndValues(x) {
+        if (typeof x === "object") {
+          if (x !== null) {
+            return fixUndefineds(x);
+          }
+          return;
+        }
+        Object.keys(x).concat(Object.getOwnPropertySymbols(x)).forEach((key) => {
+          try {
+            let origKey = key;
+            try {
+              key = parse(key);
+            } catch (e) {
+            }
+            x[key] = parse(x[origKey]);
+            if (key !== origKey) {
+              delete x[origKey];
+            }
+          } catch (e) {
+          }
+        });
+        return fixUndefineds(x);
+      }
+      function parse(x) {
+        function helper(x2) {
+          if (typeof x2 === "string") {
+            let out = parseAsString(x2);
+            if (typeof out === "string")
+              return out;
+            const results = parseAsSymbol(x2);
+            out = results ? results.out : void 0;
+            if (results && results.isASymbol)
+              return out;
+            out = parseAsRegex(x2);
+            if (out instanceof RegExp)
+              return out;
+            out = parseAsNumber(x2);
+            if (typeof out === "number")
+              return out;
+            out = parseAsDate(x2);
+            if (out instanceof Date)
+              return out;
+            out = parseWithJSONParse(x2);
+            if (typeof out !== "undefined")
+              return out;
+            return x2;
+          }
+          if (typeof x2 === "object") {
+            if (x2 === null) {
+              return null;
+            }
+            let out;
+            try {
+              out = convertObjectToTypedArray(x2);
+              if (isArray(out))
+                return out;
+            } catch (e) {
+            }
+            out = parseObjectKeysAndValues(x2);
+            if (out) {
+              try {
+                return convertObjectToTypedArray(out);
+              } catch (e) {
+                return out;
+              }
+            }
+            return x2;
+          }
+          return x2;
+        }
+        return helper(x);
+      }
+      module.exports = parse;
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/pascalify.js
+  var require_pascalify = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/pascalify.js"(exports, module) {
+      var camelify = require_camelify();
+      function pascalify(text) {
+        const out = camelify(text);
+        return out[0].toUpperCase() + out.slice(1);
+      }
+      module.exports = pascalify;
+    }
+  });
+
+  // node_modules/@jrc03c/js-text-tools/src/snakeify.js
+  var require_snakeify = __commonJS({
+    "node_modules/@jrc03c/js-text-tools/src/snakeify.js"(exports, module) {
+      var strip = require_strip();
+      function snakeify(text) {
+        if (typeof text !== "string") {
+          throw new Error("`text` must be a string!");
+        }
+        const words = strip(text).split(" ");
+        if (words.length === 0)
+          return "";
+        if (words.length === 1)
+          return words[0];
+        return words.join("_");
+      }
+      module.exports = snakeify;
     }
   });
 

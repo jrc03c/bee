@@ -5,6 +5,11 @@ module.exports = {
     es2021: true,
   },
   extends: "eslint:recommended",
+  globals: {
+    makeKey: {
+      readonly: true,
+    },
+  },
   parserOptions: {
     ecmaVersion: "latest",
   },

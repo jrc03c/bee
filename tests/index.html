@@ -68,9 +68,10 @@
     <script src="../dist/bee.min.js"></script>
     <script src="fake-jest.js"></script>
     <script src="../node_modules/@jrc03c/js-math-tools/dist/js-math-tools.js"></script>
+    <script src="../node_modules/@jrc03c/make-key/dist/make-key.js"></script>
     <script>
       /* global Bee, expect, JSMathTools, test */
-      const { decycle } = JSMathTools
+      const { DataFrame, decycle, range, normal, Series } = JSMathTools
 
       function pause(ms) {
         return new Promise((resolve, reject) => {
@@ -156,6 +157,31 @@
           const selfReferencer = [2, 3, 4]
           selfReferencer.push(selfReferencer)
 
+          let df = new DataFrame({
+            ints: range(0, 100).map(() => Math.floor(Math.random() * 10 - 5)),
+            floats: normal(100),
+            strings: range(0, 100).map(() => makeKey(8)),
+            bools: range(0, 100).map(() =>
+              Math.random() < 0.5 ? true : false
+            ),
+            nans: range(0, 100).map(() =>
+              Math.random() < 0.33
+                ? Infinity
+                : Math.random() < 0.5
+                ? -Infinity
+                : NaN
+            ),
+            nones: range(0, 100).map(() =>
+              Math.random() < 0.5 ? undefined : null
+            ),
+            symbols: range(0, 100).map(() => Symbol.for(makeKey(8))),
+            dates: range(0, 100).map(
+              () => new Date(Math.round(Math.random() * 999999999))
+            ),
+          })
+
+          const series = new Series(normal(100))
+
           const variables = [
             0,
             1,
@@ -177,6 +203,8 @@
             ],
             { hello: "world" },
             selfReferencer,
+            df,
+            series,
           ]
 
           for (const vTrue of variables) {
