@@ -1,3 +1,7 @@
+> ⚠️ **NOTE:** ⚠️ This project is being merged into a monorepo [here](https://github.com/jrc03c/monorepo/tree/main/packages/bee). This repo will soon be archived.
+
+---
+
 <p align="center">
   <img src="logo.png" width="256">
 </p>
